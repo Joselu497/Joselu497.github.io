@@ -6,12 +6,18 @@ App web instalable para crear **videos verticales educativos** con dibujos y for
 
 ## 1. Cómo abrirla
 
+### Ya está publicada (lo más rápido)
+
+**Enlace:** https://joselu497.github.io/reels-educativos/
+
+Abre ese enlace en el móvil o escanea `qr-reels.png`. Está alojada gratis en GitHub Pages, así que el enlace es fijo y no depende de ningún PC encendido.
+
 ### Opción A · Instalarla como app (recomendada)
 
-La app necesita abrirse desde una dirección `https://` para poder instalarse, usar el micrófono y funcionar sin internet. Puedes publicar esta carpeta gratis en:
+La app necesita abrirse desde una dirección `https://` para poder instalarse, usar el micrófono y funcionar sin internet. Si algún día quieres publicarla en otro sitio, esta carpeta funciona tal cual en:
 
-- **Netlify Drop** — entra a `app.netlify.com/drop` y arrastra la carpeta `reels-movil`. Te da un enlace `https://…` al instante.
 - **GitHub Pages** — sube la carpeta a un repositorio y activa Pages en *Settings → Pages*.
+- **Netlify** — arrastra la carpeta en `app.netlify.com`.
 - **Cloudflare Pages** — crea un proyecto y sube la carpeta.
 - **Vercel** — importa el repositorio o arrastra la carpeta.
 
@@ -193,7 +199,7 @@ reels-movil/
 - **Estilos:** `css/estilos.css` usa variables CSS al inicio del archivo.
 - **Iconos:** edita y ejecuta `python herramientas/hacer_iconos.py`.
 
-Después de cambiar archivos, sube la versión del caché en `sw.js` (`reels-educativos-v3` → `v4`) para que los dispositivos instalados reciban los cambios.
+Después de cambiar archivos, sube la versión del caché en `sw.js` (`reels-educativos-v5` → `v6`) y haz `git push` para que los dispositivos instalados reciban los cambios.
 
 ---
 
