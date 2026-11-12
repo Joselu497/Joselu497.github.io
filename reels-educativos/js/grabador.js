@@ -365,26 +365,48 @@
       var duracion = Math.max(0.5, Number(opciones.duracion) || 1);
       var canceladoDurante = false;
 
-      await new Promise(function (resolver) {
-        function bucle() {
-          if (senal.cancelado) {
-            canceladoDurante = true;
-            try { if (grabador.state !== 'inactive') grabador.stop(); } catch (e) { /* ignorar */ }
-            resolver();
-            return;
-          }
-          var t = (performance.now() - inicio) / 1000;
-          if (t >= duracion + 0.18) {
-            try { if (grabador.state !== 'inactive') grabador.stop(); } catch (e) { /* ignorar */ }
-            resolver();
-            return;
-          }
-          var tt = Math.min(t, duracion);
-          if (opciones.alFrame) opciones.alFrame(tt);
-          if (opciones.alProgreso) opciones.alProgreso(limitar(tt / duracion, 0, 1));
-          global.requestAnimationFrame(bucle);
+      /* El bucle se apoya en requestAnimationFrame, pero un vigilante por
+         temporizador lo reactiva si el navegador congela los fotogramas
+         (pestaña en segundo plano, pantalla apagada o ahorro de energía). */
+      var resolver = null;
+      var ultimoPaso = performance.now();
+      var vigilante = null;
+
+      function terminar() {
+        if (!resolver) return;
+        var r = resolver;
+        resolver = null;
+        if (vigilante) { clearInterval(vigilante); vigilante = null; }
+        r();
+      }
+
+      function paso() {
+        if (!resolver) return;
+        if (senal.cancelado) {
+          canceladoDurante = true;
+          try { if (grabador.state !== 'inactive') grabador.stop(); } catch (e) { /* ignorar */ }
+          terminar();
+          return;
         }
-        global.requestAnimationFrame(bucle);
+        var t = (performance.now() - inicio) / 1000;
+        if (t >= duracion + 0.18) {
+          try { if (grabador.state !== 'inactive') grabador.stop(); } catch (e) { /* ignorar */ }
+          terminar();
+          return;
+        }
+        var tt = Math.min(t, duracion);
+        if (opciones.alFrame) opciones.alFrame(tt);
+        if (opciones.alProgreso) opciones.alProgreso(limitar(tt / duracion, 0, 1));
+        ultimoPaso = performance.now();
+        global.requestAnimationFrame(paso);
+      }
+
+      await new Promise(function (res) {
+        resolver = res;
+        vigilante = setInterval(function () {
+          if (performance.now() - ultimoPaso > 320) paso();
+        }, 220);
+        paso();
       });
 
       await terminado;

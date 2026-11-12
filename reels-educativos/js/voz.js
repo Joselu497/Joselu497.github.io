@@ -215,15 +215,12 @@
     var candidatos = PROXIES.map(function (f) { return f(url); });
     var ultimo = null;
 
-    /* El proxy rápido, solo, con un reintento: si responde no se lanza nada más. */
-    for (var intento = 0; intento < 2; intento++) {
-      if (senal && senal.cancelado) throw cancelado();
-      try {
-        var primero = await conTiempo(intentar(candidatos[0]), 6000);
-        if (esAudio(primero)) return primero;
-      } catch (e) { ultimo = e; }
-      if (intento === 0) await esperar(250);
-    }
+    /* El proxy rápido, solo: si responde no se lanza nada más. */
+    if (senal && senal.cancelado) throw cancelado();
+    try {
+      var primero = await conTiempo(intentar(candidatos[0]), 5000);
+      if (esAudio(primero)) return primero;
+    } catch (e) { ultimo = e; }
 
     /* Respaldo: varios proxies en paralelo por lotes. */
     var resto = candidatos.slice(1);
@@ -232,7 +229,7 @@
       if (!lote.length) continue;
       if (senal && senal.cancelado) throw cancelado();
       try {
-        var bytes = await conTiempo(primeroQueSirva(lote), 10000);
+        var bytes = await conTiempo(primeroQueSirva(lote), 7000);
         if (esAudio(bytes)) return bytes;
       } catch (e) { ultimo = e; }
     }
@@ -284,21 +281,18 @@
 
     var errores = [];
     var rutas = [porGoogle, porSoundOfText];
-    for (var intento = 0; intento < 2; intento++) {
-      for (var i = 0; i < rutas.length; i++) {
-        if (senal && senal.cancelado) throw cancelado();
-        try {
-          var bytes = await rutas[i](texto, idioma, senal);
-          if (esAudio(bytes)) {
-            await aCache(llave, bytes);
-            return bytes;
-          }
-        } catch (e) {
-          if (e && e.cancelado) throw e;
-          errores.push((e && e.message) || 'error');
+    for (var i = 0; i < rutas.length; i++) {
+      if (senal && senal.cancelado) throw cancelado();
+      try {
+        var bytes = await rutas[i](texto, idioma, senal);
+        if (esAudio(bytes)) {
+          await aCache(llave, bytes);
+          return bytes;
         }
+      } catch (e) {
+        if (e && e.cancelado) throw e;
+        errores.push((e && e.message) || 'error');
       }
-      if (intento === 0) await esperar(500);
     }
     var err = new Error('No se pudo descargar la voz. Revisa tu conexión e inténtalo otra vez.');
     err.detalle = errores.join(' | ');
@@ -369,6 +363,7 @@
     opciones = opciones || {};
     var senal = opciones.senal || { cancelado: false };
     var tasa = limitar(Number(opciones.velocidad) || 1, 0.75, 1.35);
+    var limite = Number(opciones.limiteMs) || 40000;
     var total = escenas.length;
     var voces = new Array(total);
     var duraciones = new Array(total);
@@ -402,7 +397,18 @@
 
     var trabajadores = [];
     for (var w = 0; w < Math.min(CONCURRENCIA, total); w++) trabajadores.push(trabajador());
-    await Promise.all(trabajadores);
+    var todos = Promise.all(trabajadores);
+    todos.catch(function () { /* el fallo ya se informa abajo */ });
+    var fin = await Promise.race([
+      todos.then(function () { return 'listo'; }),
+      esperar(limite).then(function () { return 'tiempo'; })
+    ]);
+    if (fin !== 'listo') {
+      if (senal.cancelado) throw cancelado();
+      var lento = new Error('La voz tardó demasiado en descargarse.');
+      lento.detalle = error && error.message;
+      throw lento;
+    }
     if (error) throw error;
 
     return { voces: voces, duraciones: duraciones };

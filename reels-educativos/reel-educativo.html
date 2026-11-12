@@ -4033,15 +4033,12 @@ textarea::placeholder {
     var candidatos = PROXIES.map(function (f) { return f(url); });
     var ultimo = null;
 
-    /* El proxy rápido, solo, con un reintento: si responde no se lanza nada más. */
-    for (var intento = 0; intento < 2; intento++) {
-      if (senal && senal.cancelado) throw cancelado();
-      try {
-        var primero = await conTiempo(intentar(candidatos[0]), 6000);
-        if (esAudio(primero)) return primero;
-      } catch (e) { ultimo = e; }
-      if (intento === 0) await esperar(250);
-    }
+    /* El proxy rápido, solo: si responde no se lanza nada más. */
+    if (senal && senal.cancelado) throw cancelado();
+    try {
+      var primero = await conTiempo(intentar(candidatos[0]), 5000);
+      if (esAudio(primero)) return primero;
+    } catch (e) { ultimo = e; }
 
     /* Respaldo: varios proxies en paralelo por lotes. */
     var resto = candidatos.slice(1);
@@ -4050,7 +4047,7 @@ textarea::placeholder {
       if (!lote.length) continue;
       if (senal && senal.cancelado) throw cancelado();
       try {
-        var bytes = await conTiempo(primeroQueSirva(lote), 10000);
+        var bytes = await conTiempo(primeroQueSirva(lote), 7000);
         if (esAudio(bytes)) return bytes;
       } catch (e) { ultimo = e; }
     }
@@ -4102,21 +4099,18 @@ textarea::placeholder {
 
     var errores = [];
     var rutas = [porGoogle, porSoundOfText];
-    for (var intento = 0; intento < 2; intento++) {
-      for (var i = 0; i < rutas.length; i++) {
-        if (senal && senal.cancelado) throw cancelado();
-        try {
-          var bytes = await rutas[i](texto, idioma, senal);
-          if (esAudio(bytes)) {
-            await aCache(llave, bytes);
-            return bytes;
-          }
-        } catch (e) {
-          if (e && e.cancelado) throw e;
-          errores.push((e && e.message) || 'error');
+    for (var i = 0; i < rutas.length; i++) {
+      if (senal && senal.cancelado) throw cancelado();
+      try {
+        var bytes = await rutas[i](texto, idioma, senal);
+        if (esAudio(bytes)) {
+          await aCache(llave, bytes);
+          return bytes;
         }
+      } catch (e) {
+        if (e && e.cancelado) throw e;
+        errores.push((e && e.message) || 'error');
       }
-      if (intento === 0) await esperar(500);
     }
     var err = new Error('No se pudo descargar la voz. Revisa tu conexión e inténtalo otra vez.');
     err.detalle = errores.join(' | ');
@@ -4187,6 +4181,7 @@ textarea::placeholder {
     opciones = opciones || {};
     var senal = opciones.senal || { cancelado: false };
     var tasa = limitar(Number(opciones.velocidad) || 1, 0.75, 1.35);
+    var limite = Number(opciones.limiteMs) || 40000;
     var total = escenas.length;
     var voces = new Array(total);
     var duraciones = new Array(total);
@@ -4220,7 +4215,18 @@ textarea::placeholder {
 
     var trabajadores = [];
     for (var w = 0; w < Math.min(CONCURRENCIA, total); w++) trabajadores.push(trabajador());
-    await Promise.all(trabajadores);
+    var todos = Promise.all(trabajadores);
+    todos.catch(function () { /* el fallo ya se informa abajo */ });
+    var fin = await Promise.race([
+      todos.then(function () { return 'listo'; }),
+      esperar(limite).then(function () { return 'tiempo'; })
+    ]);
+    if (fin !== 'listo') {
+      if (senal.cancelado) throw cancelado();
+      var lento = new Error('La voz tardó demasiado en descargarse.');
+      lento.detalle = error && error.message;
+      throw lento;
+    }
     if (error) throw error;
 
     return { voces: voces, duraciones: duraciones };
@@ -4611,26 +4617,48 @@ textarea::placeholder {
       var duracion = Math.max(0.5, Number(opciones.duracion) || 1);
       var canceladoDurante = false;
 
-      await new Promise(function (resolver) {
-        function bucle() {
-          if (senal.cancelado) {
-            canceladoDurante = true;
-            try { if (grabador.state !== 'inactive') grabador.stop(); } catch (e) { /* ignorar */ }
-            resolver();
-            return;
-          }
-          var t = (performance.now() - inicio) / 1000;
-          if (t >= duracion + 0.18) {
-            try { if (grabador.state !== 'inactive') grabador.stop(); } catch (e) { /* ignorar */ }
-            resolver();
-            return;
-          }
-          var tt = Math.min(t, duracion);
-          if (opciones.alFrame) opciones.alFrame(tt);
-          if (opciones.alProgreso) opciones.alProgreso(limitar(tt / duracion, 0, 1));
-          global.requestAnimationFrame(bucle);
+      /* El bucle se apoya en requestAnimationFrame, pero un vigilante por
+         temporizador lo reactiva si el navegador congela los fotogramas
+         (pestaña en segundo plano, pantalla apagada o ahorro de energía). */
+      var resolver = null;
+      var ultimoPaso = performance.now();
+      var vigilante = null;
+
+      function terminar() {
+        if (!resolver) return;
+        var r = resolver;
+        resolver = null;
+        if (vigilante) { clearInterval(vigilante); vigilante = null; }
+        r();
+      }
+
+      function paso() {
+        if (!resolver) return;
+        if (senal.cancelado) {
+          canceladoDurante = true;
+          try { if (grabador.state !== 'inactive') grabador.stop(); } catch (e) { /* ignorar */ }
+          terminar();
+          return;
         }
-        global.requestAnimationFrame(bucle);
+        var t = (performance.now() - inicio) / 1000;
+        if (t >= duracion + 0.18) {
+          try { if (grabador.state !== 'inactive') grabador.stop(); } catch (e) { /* ignorar */ }
+          terminar();
+          return;
+        }
+        var tt = Math.min(t, duracion);
+        if (opciones.alFrame) opciones.alFrame(tt);
+        if (opciones.alProgreso) opciones.alProgreso(limitar(tt / duracion, 0, 1));
+        ultimoPaso = performance.now();
+        global.requestAnimationFrame(paso);
+      }
+
+      await new Promise(function (res) {
+        resolver = res;
+        vigilante = setInterval(function () {
+          if (performance.now() - ultimoPaso > 320) paso();
+        }, 220);
+        paso();
       });
 
       await terminado;
@@ -5312,6 +5340,7 @@ textarea::placeholder {
               idioma: idiomaVoz(),
               velocidad: estado.ritmo,
               senal: senal,
+              limiteMs: 40000,
               alEstado: function (txt) { el.estadoGrabacion.textContent = txt; },
               alProgreso: function (f) { el.barraGrabacion.style.width = (f * 100).toFixed(1) + '%'; }
             });
@@ -5323,31 +5352,9 @@ textarea::placeholder {
             el.barraGrabacion.style.width = '0%';
           } catch (e) {
             if (senal.cancelado) throw e;
-            console.warn('Voz natural, primer intento:', e);
+            console.warn('Voz natural:', e);
             vozData = null;
-            el.estadoGrabacion.textContent = 'La voz tardó; probando otra vez…';
-            try {
-              await new Promise(function (r) { setTimeout(r, 900); });
-              if (senal.cancelado) throw e;
-              vozData = await Voz.paraEscenas(videoEstado.escenas, {
-                idioma: idiomaVoz(),
-                velocidad: estado.ritmo,
-                senal: senal,
-                alEstado: function (txt) { el.estadoGrabacion.textContent = txt; },
-                alProgreso: function (f) { el.barraGrabacion.style.width = (f * 100).toFixed(1) + '%'; }
-              });
-              videoEstado = Motor.crearEstado(estado.guion, Object.assign({}, opciones(), {
-                duraciones: vozData.duraciones
-              }));
-              tPreview = 0;
-              dibujar(0);
-              el.barraGrabacion.style.width = '0%';
-            } catch (e2) {
-              if (senal.cancelado) throw e2;
-              console.error('Voz natural:', e2);
-              vozData = null;
-              avisar('No se pudo descargar la voz natural. El video se grabará sin voz.', 6200);
-            }
+            avisar('La voz natural no se pudo descargar a tiempo. El video se grabará sin voz; puedes intentarlo otra vez.', 6500);
           }
         }
       }
