@@ -1,5 +1,5 @@
 /* Service worker: permite instalar la app y usarla sin internet. */
-const CACHE = 'reels-educativos-v7';
+const CACHE = 'reels-educativos-v8';
 const ARCHIVOS = [
   './',
   './index.html',
@@ -79,7 +79,7 @@ self.addEventListener('fetch', (evento) => {
 
   if (peticion.mode === 'navigate') {
     evento.respondWith(
-      fetch(peticion)
+      fetch(peticion, { cache: 'no-cache' })
         .then((respuesta) => {
           if (!respuesta || !respuesta.ok) throw new Error('sin red');
           const copia = respuesta.clone();
@@ -94,7 +94,7 @@ self.addEventListener('fetch', (evento) => {
   evento.respondWith(
     caches.match(peticion).then((guardado) => {
       if (guardado) return guardado;
-      return fetch(peticion).then((respuesta) => {
+      return fetch(peticion, { cache: 'no-cache' }).then((respuesta) => {
         if (respuesta.ok) {
           const copia = respuesta.clone();
           caches.open(CACHE).then((cache) => cache.put(peticion, copia));
