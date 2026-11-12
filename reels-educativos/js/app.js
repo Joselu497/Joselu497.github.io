@@ -655,9 +655,31 @@
             el.barraGrabacion.style.width = '0%';
           } catch (e) {
             if (senal.cancelado) throw e;
-            console.error('Voz natural:', e);
+            console.warn('Voz natural, primer intento:', e);
             vozData = null;
-            avisar('No se pudo descargar la voz natural. El video se grabará sin voz.', 6200);
+            el.estadoGrabacion.textContent = 'La voz tardó; probando otra vez…';
+            try {
+              await new Promise(function (r) { setTimeout(r, 900); });
+              if (senal.cancelado) throw e;
+              vozData = await Voz.paraEscenas(videoEstado.escenas, {
+                idioma: idiomaVoz(),
+                velocidad: estado.ritmo,
+                senal: senal,
+                alEstado: function (txt) { el.estadoGrabacion.textContent = txt; },
+                alProgreso: function (f) { el.barraGrabacion.style.width = (f * 100).toFixed(1) + '%'; }
+              });
+              videoEstado = Motor.crearEstado(estado.guion, Object.assign({}, opciones(), {
+                duraciones: vozData.duraciones
+              }));
+              tPreview = 0;
+              dibujar(0);
+              el.barraGrabacion.style.width = '0%';
+            } catch (e2) {
+              if (senal.cancelado) throw e2;
+              console.error('Voz natural:', e2);
+              vozData = null;
+              avisar('No se pudo descargar la voz natural. El video se grabará sin voz.', 6200);
+            }
           }
         }
       }

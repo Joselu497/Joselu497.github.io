@@ -43,7 +43,7 @@ cd reels-movil
 python herramientas/empaquetar.py
 ```
 
-Genera `reel-educativo.html`, que puedes abrir directamente o enviar por WhatsApp. Sirve para probar y grabar, pero **sin instalación ni service worker**; para el micrófono conviene abrirlo desde `https://` o `localhost`.
+Genera `reel-educativo.html`, que puedes abrir directamente o enviar por WhatsApp. Sirve para probar y grabar, pero **sin instalación ni service worker**; para el micrófono conviene abrirlo desde `https://` o `localhost`. La voz natural necesita internet y, abierto como archivo local, el navegador puede bloquear la descarga de audio: para anuncios con voz usa la versión publicada.
 
 ---
 

@@ -8,7 +8,7 @@
   var MAX = 170;
   var CACHE = 'reels-voz-v1';
   var TIEMPO_MAX = 7000;
-  var CONCURRENCIA = 3;
+  var CONCURRENCIA = 4;
 
   var PROXIES = [
     function (u) { return 'https://proxy.corsfix.com/?' + u; },
@@ -284,18 +284,21 @@
 
     var errores = [];
     var rutas = [porGoogle, porSoundOfText];
-    for (var i = 0; i < rutas.length; i++) {
-      if (senal && senal.cancelado) throw cancelado();
-      try {
-        var bytes = await rutas[i](texto, idioma, senal);
-        if (esAudio(bytes)) {
-          await aCache(llave, bytes);
-          return bytes;
+    for (var intento = 0; intento < 2; intento++) {
+      for (var i = 0; i < rutas.length; i++) {
+        if (senal && senal.cancelado) throw cancelado();
+        try {
+          var bytes = await rutas[i](texto, idioma, senal);
+          if (esAudio(bytes)) {
+            await aCache(llave, bytes);
+            return bytes;
+          }
+        } catch (e) {
+          if (e && e.cancelado) throw e;
+          errores.push((e && e.message) || 'error');
         }
-      } catch (e) {
-        if (e && e.cancelado) throw e;
-        errores.push((e && e.message) || 'error');
       }
+      if (intento === 0) await esperar(500);
     }
     var err = new Error('No se pudo descargar la voz. Revisa tu conexión e inténtalo otra vez.');
     err.detalle = errores.join(' | ');
