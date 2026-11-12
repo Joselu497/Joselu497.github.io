@@ -49,14 +49,30 @@ Genera `reel-educativo.html`, que puedes abrir directamente o enviar por WhatsAp
 
 ## 2. Uso rápido
 
-1. Escribe **una idea por línea** en el cuadro de guion.
-2. Opcional: empieza la línea con una forma (`#idea`, `#pasos`, `#ciclo`…).
-3. Elige **formato** (9:16, 1:1, 16:9), **calidad**, **paleta**, **personaje** y **ritmo**.
-4. Pulsa **Generar video**.
-5. Cuenta regresiva de 3 segundos → la animación corre en tiempo real y se graba.
-6. Al terminar: **Compartir** (TikTok, Instagram, WhatsApp…) o **Descargar**.
+1. Elige una **temática** para empezar con guion, paleta, personaje y voz ya configurados.
+2. Escribe **una idea por línea** en el cuadro de guion.
+3. Opcional: empieza la línea con una forma (`#idea`, `#pasos`, `#precio`…).
+4. Elige **formato** (9:16, 1:1, 16:9), **calidad**, **paleta**, **personaje** y **ritmo**.
+5. Pulsa **Generar video**.
+6. Cuenta regresiva de 3 segundos → la animación corre en tiempo real y se graba.
+7. Al terminar: **Compartir** (TikTok, Instagram, WhatsApp…) o **Descargar**.
 
-> Duración del video = duración de la animación. Si tienes 7 escenas, el video durará aproximadamente 20–25 segundos (según el ritmo).
+> Duración del video = duración de la animación. Si tienes 7 escenas, el video durará aproximadamente 20–25 segundos (según el ritmo). Con voz natural, cada escena dura lo que dura su audio.
+
+### Temáticas listas
+
+Los botones sobre el guion cambian todo de una vez. Si ya escribiste algo, la app pide confirmación antes de reemplazarlo.
+
+| Temática | Para qué sirve | Paleta | Voz |
+|---|---|---|---|
+| **Educativo** | Clases y explicaciones cortas | Pizarra azul | Sin voz |
+| **Anuncio** | Promocionar un negocio o servicio | Frutiger Aero | Natural |
+| **Agencia de buses** | Rutas, horarios, pasajes y reservas | Frutiger Aero | Natural |
+| **Tienda de decoración** | Productos, precios y dirección | Frutiger Aero | Natural |
+| **Oferta relámpago** | Descuentos y ventas por tiempo limitado | Neón | Natural |
+| **Evento** | Fechas, lugar e invitación | Papel y tinta | Natural |
+
+Puedes cambiar cualquier ajuste después de aplicar la temática; el guion es solo un punto de partida.
 
 ### Formas disponibles
 
@@ -74,8 +90,15 @@ Genera `reel-educativo.html`, que puedes abrir directamente o enviar por WhatsAp
 | `#formula` | Ecuación por bloques | Matemáticas, química |
 | `#circulo` | Círculos concéntricos | Ideas que giran alrededor de otra |
 | `#subrayado` | Texto resaltado | Frases clave |
+| `#precio` | Cartel grande con el precio | Mostrar cuánto cuesta |
+| `#oferta` | Sello brillante de descuento | Porcentajes y 2×1 |
+| `#servicio` | Lista de servicios con visto | Qué ofreces (`|` separa los servicios) |
+| `#horario` | Reloj con tu horario | Días y horas de atención |
+| `#contacto` | Teléfono con ondas | WhatsApp, celular, redes |
+| `#ubicacion` | Pin de mapa animado | Dirección o local |
+| `#cta` | Botón grande de acción | “Reserva”, “compra”, “escríbenos” |
 
-Si no pones prefijo, la app elige una forma según el contenido (números → `#numero`, “vs” → `#comparar`, listas con comas → `#pasos`, etc.).
+Si no pones prefijo, la app elige una forma según el contenido: precios → `#precio`, descuentos → `#oferta`, WhatsApp o teléfonos → `#contacto`, direcciones → `#ubicacion`, días y horas → `#horario`, verbos como “reserva” → `#cta`, servicios → `#servicio`, números → `#numero`, “vs” → `#comparar`, listas con comas → `#pasos`, y así.
 
 ### Ejemplo listo para probar
 
@@ -133,16 +156,43 @@ Con `#personaje` el personaje sale **grande y centrado**, saluda y dice tu texto
 
 ---
 
+### Paletas
+
+En **Formato y estilo → Paleta** puedes elegir:
+
+| Paleta | Estilo |
+|---|---|
+| **Pizarra azul** | Fondo azul profundo con acentos celestes |
+| **Pizarra verde** | Verde pizarra con detalles cálidos |
+| **Papel y tinta** | Claro, tipo cuaderno |
+| **Neón** | Violeta y cian brillantes |
+| **Frutiger Aero** | Cielo y agua brillantes, colina verde, cristal, reflejos y burbujas en movimiento |
+
+Frutiger Aero es la paleta pensada para anuncios: fondo luminoso, texto con sombra para que se lea sobre el agua y etiquetas en azul oscuro.
+
+---
+
 ## 3. Audio
 
-- **Música de fondo:** elige un archivo MP3/M4A/OGG. Se repite en bucle y se mezcla con el video.
+- **Música de fondo:** elige un archivo MP3/M4A/OGG. Se repite en bucle y se mezcla con el video. Baja automáticamente cuando hay voz para que se entienda.
+- **Voz natural:** la app lee tu guion con una voz de Google, gratis y sin cuentas. Elige **español** (`es-ES`) o **latino** (`es-MX`).
 - **Narración grabada:** elige un audio ya grabado (nota de voz, etc.). Se reproduce una vez desde el inicio.
-- **Micrófono:** activa la opción y narra en vivo durante la cuenta regresiva y la animación. El navegador pedirá permiso la primera vez.
+- **Mi voz con el micrófono:** narra en vivo durante la cuenta regresiva y la animación. El navegador pedirá permiso la primera vez.
 - **Volumen de la música:** se mezcla aparte de la voz.
 
-El video siempre incluye una pista de audio (aunque esté en silencio) para que las redes sociales lo acepten.
+### Cómo funciona la voz natural
 
-> **Voz IA:** el navegador no permite capturar la voz del sistema dentro de la grabación. Por eso la voz debe ser tuya (micrófono) o un archivo de audio importado. Si quieres voz IA, puedes generarla en otra app y luego importarla como narración.
+1. Al pulsar **Generar video**, la app divide el guion en frases de menos de 170 caracteres.
+2. Descarga cada frase como MP3 y calcula su duración real; cada escena dura lo que dura su voz más un segundo de margen.
+3. La voz se limpia y se realza (filtro de graves, presencia, compresor) para que suene menos robótica.
+4. El MP3 queda guardado en el teléfono (Cache Storage `reels-voz-v1`). La próxima vez con el mismo texto no se descarga.
+5. Si no hay internet o la descarga falla, el video se graba **sin voz** y la app te avisa.
+
+Puedes escuchar una muestra con **Escuchar prueba de voz** antes de generar.
+
+> La voz natural sí necesita internet al generar el video: el texto se envía a Google Translate TTS y el audio se copia mediante un proxy CORS público. No se envía nada más. El resto del video se genera en tu dispositivo.
+
+El video siempre incluye una pista de audio (aunque esté en silencio) para que las redes sociales lo acepten.
 
 ---
 
@@ -159,12 +209,13 @@ El video siempre incluye una pista de audio (aunque esté en silencio) para que 
 
 ## 5. Privacidad
 
-Todo ocurre en tu dispositivo:
+Todo ocurre en tu dispositivo, con una excepción: la voz natural.
 
 - El guion se guarda solo en `localStorage` de tu navegador.
-- La música, la narración y el micrófono se procesan con Web Audio en memoria.
+- La música, la narración, la voz descargada y el micrófono se procesan con Web Audio en memoria.
 - El video se graba con `MediaRecorder` y no sale del teléfono.
-- No hay servidor, cuentas, analíticas ni límite de videos.
+- Si eliges **voz natural**, solo el texto de cada frase viaja a Google Translate TTS para obtener el audio; el MP3 se guarda en la caché del teléfono. Si eliges **sin voz**, **micrófono** o **narración importada**, no se envía nada.
+- No hay servidor propio, cuentas, analíticas ni límite de videos.
 
 ---
 
@@ -176,6 +227,7 @@ reels-movil/
 ├── css/estilos.css            Estilos móviles y de escritorio
 ├── js/dibujos.js              Paletas, formas y personajes animados (Canvas 2D)
 ├── js/motor.js                Guion → escenas, textos y cuadros
+├── js/voz.js                  Voz natural: descarga, caché y duraciones
 ├── js/grabador.js             MediaRecorder + mezcla de audio
 ├── js/app.js                  Interfaz, vista previa, PWA
 ├── sw.js                      Service worker (modo offline)
@@ -199,18 +251,18 @@ reels-movil/
 - **Estilos:** `css/estilos.css` usa variables CSS al inicio del archivo.
 - **Iconos:** edita y ejecuta `python herramientas/hacer_iconos.py`.
 
-Después de cambiar archivos, sube la versión del caché en `sw.js` (`reels-educativos-v5` → `v6`) y haz `git push` para que los dispositivos instalados reciban los cambios.
+Después de cambiar archivos, sube la versión del caché en `sw.js` (`reels-educativos-v6` → `v7`) y haz `git push` para que los dispositivos instalados reciban los cambios.
 
 ---
 
 ## 8. Compatibilidad
 
-| Navegador | Grabar | Micrófono | Instalar |
-|---|---|---|---|
-| Chrome Android (actual) | MP4 | Sí | Sí |
-| Safari iPhone 16+ | MP4 | Sí | Sí |
-| Chrome/Edge escritorio | MP4 | Sí | Sí |
-| Firefox | WebM | Sí | Limitado |
+| Navegador | Grabar | Micrófono | Voz natural | Instalar |
+|---|---|---|---|---|
+| Chrome Android (actual) | MP4 | Sí | Sí | Sí |
+| Safari iPhone 16+ | MP4 | Sí | Sí | Sí |
+| Chrome/Edge escritorio | MP4 | Sí | Sí | Sí |
+| Firefox | WebM | Sí | Sí | Limitado |
 
 Si un navegador no soporta `MediaRecorder` o `canvas.captureStream`, la app avisa en la parte inferior del editor.
 

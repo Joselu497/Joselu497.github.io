@@ -59,6 +59,7 @@
             <button class="enlace" id="btn-ejemplo">Usar ejemplo</button>
           </div>
           <p class="ayuda">Una idea por línea. Las líneas vacías se ignoran.</p>
+          <div class="tematicas" id="tematicas" aria-label="Temáticas"></div>
           <textarea id="guion" rows="7" spellcheck="true" placeholder="#idea La fotosíntesis&#10;Las plantas fabrican su alimento&#10;#pasos Toman agua y CO2&#10;#check Por eso limpian el aire"></textarea>
           <div class="chips" id="chips-visuales" aria-label="Añadir una forma"></div>
           <p class="contador" id="contador">0 escenas · 0:00</p>
@@ -86,6 +87,7 @@
                 <option value="menta">Pizarra verde</option>
                 <option value="papel">Papel y tinta</option>
                 <option value="neon">Neón</option>
+                <option value="aero">Frutiger Aero</option>
               </select>
             </label>
             <label class="campo">Ritmo
@@ -117,10 +119,16 @@
             <input type="range" id="volumen" min="0" max="1" step="0.05" value="0.35">
             <output id="volumen-valor">35%</output>
           </label>
-          <label class="interruptor">
-            <input type="checkbox" id="microfono">
-            <span>Grabar mi voz con el micrófono</span>
+          <label class="campo">Voz
+            <select id="voz">
+              <option value="ninguna">Sin voz (solo música)</option>
+              <option value="natural">Voz natural · español</option>
+              <option value="natural-mx">Voz natural · latino</option>
+              <option value="mic">Mi voz con el micrófono</option>
+            </select>
           </label>
+          <button class="boton-secundario compacto" id="btn-probar-voz" type="button">Escuchar prueba de voz</button>
+          <p class="nota" id="nota-voz">La voz natural se descarga una vez por frase y luego queda guardada en tu teléfono. Necesita internet al generar el video.</p>
           <p class="nota">Sin audio el video se genera igual, en silencio. Si eliges micrófono, narra mientras corre la animación.</p>
         </details>
 
@@ -156,14 +164,15 @@
       <button class="boton-icono" id="btn-cerrar-ayuda" aria-label="Cerrar">✕</button>
     </div>
     <div class="ayuda-contenido">
-      <p><strong>1.</strong> Escribe una idea por línea. Cada línea se convierte en una escena con una forma animada.</p>
+      <p><strong>1.</strong> Escribe una idea por línea o elige una <strong>temática</strong> para empezar con un guion de ejemplo. Cada línea se convierte en una escena con una forma animada.</p>
       <p><strong>2.</strong> Elige la forma al inicio de la línea:</p>
       <ul class="lista-visuales" id="lista-visuales"></ul>
-      <p><strong>3.</strong> En <strong>Formato y estilo</strong> elige un <strong>personaje</strong>: aparecerá como mascota animada en cada escena. Con <code>#personaje</code> el personaje sale grande y dice tu texto en un globo.</p>
-      <p><strong>4.</strong> Pulsa <strong>Generar video</strong>. La animación se reproduce en tiempo real y se graba dentro de tu teléfono.</p>
-      <p><strong>5.</strong> Al terminar puedes <strong>compartir</strong> el video con TikTok, Instagram o WhatsApp, o descargarlo.</p>
+      <p><strong>3.</strong> En <strong>Formato y estilo</strong> elige un <strong>personaje</strong>: aparecerá como mascota animada en cada escena. Con <code>#personaje</code> el personaje sale grande y dice tu texto en un globo. La paleta <strong>Frutiger Aero</strong> añade cielo, agua, cristal y burbujas brillantes.</p>
+      <p><strong>4.</strong> En <strong>Audio</strong> puedes poner música, una narración grabada o una <strong>voz natural</strong> que lee tu guion con acento español o latino. La voz se descarga una vez por frase y queda guardada en el teléfono.</p>
+      <p><strong>5.</strong> Pulsa <strong>Generar video</strong>. La animación se reproduce en tiempo real y se graba dentro de tu teléfono.</p>
+      <p><strong>6.</strong> Al terminar puedes <strong>compartir</strong> el video con TikTok, Instagram o WhatsApp, o descargarlo.</p>
       <p class="nota"><strong>En iPhone:</strong> para instalarla, toca <em>Compartir</em> en Safari y elige <em>Añadir a pantalla de inicio</em>.</p>
-      <p class="nota">Todo ocurre en tu dispositivo: no se sube nada a internet y no hay límite de videos.</p>
+      <p class="nota">El video se genera en tu dispositivo y no hay límite de videos. La voz natural sí usa internet para descargar el audio la primera vez.</p>
       <p class="nota">Para música, usa archivos libres de derechos. El micrófono necesita permiso del navegador.</p>
     </div>
     <button class="boton-secundario ancho" id="btn-cerrar-ayuda-2">Entendido</button>
@@ -173,6 +182,7 @@
 
   <script src="js/dibujos.js"></script>
   <script src="js/motor.js"></script>
+  <script src="js/voz.js"></script>
   <script src="js/grabador.js"></script>
   <script src="js/app.js"></script>
 </body>

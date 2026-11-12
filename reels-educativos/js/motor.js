@@ -17,7 +17,14 @@
     { id: 'check', etiqueta: 'Conclusión', prefijo: '#check', ayuda: 'Marca de verificación' },
     { id: 'formula', etiqueta: 'Fórmula', prefijo: '#formula', ayuda: 'Ecuación por bloques' },
     { id: 'circulo', etiqueta: 'Concepto', prefijo: '#circulo', ayuda: 'Círculos concéntricos' },
-    { id: 'subrayado', etiqueta: 'Clave', prefijo: '#subrayado', ayuda: 'Texto resaltado' }
+    { id: 'subrayado', etiqueta: 'Clave', prefijo: '#subrayado', ayuda: 'Texto resaltado' },
+    { id: 'precio', etiqueta: 'Precio', prefijo: '#precio', ayuda: 'Cartel grande con el precio' },
+    { id: 'oferta', etiqueta: 'Oferta', prefijo: '#oferta', ayuda: 'Sello brillante de descuento' },
+    { id: 'servicio', etiqueta: 'Servicios', prefijo: '#servicio', ayuda: 'Lista de servicios con visto' },
+    { id: 'horario', etiqueta: 'Horario', prefijo: '#horario', ayuda: 'Reloj con tu horario' },
+    { id: 'contacto', etiqueta: 'Contacto', prefijo: '#contacto', ayuda: 'Teléfono con ondas' },
+    { id: 'ubicacion', etiqueta: 'Ubicación', prefijo: '#ubicacion', ayuda: 'Pin de mapa animado' },
+    { id: 'cta', etiqueta: 'Llamada', prefijo: '#cta', ayuda: 'Botón grande para reservar o comprar' }
   ];
 
   var MAPA = {};
@@ -60,6 +67,17 @@
 
   function autoVisual(texto, rotacion) {
     var t = texto.toLowerCase();
+
+    /* Anuncios y negocios: se detectan antes que las formas educativas. */
+    if (/%|\b(oferta|ofertas|descuento|rebaja|liquidaci[oó]n|promo|promoci[oó]n)\b/.test(t)) return 'oferta';
+    if (/\b(2\s*[xX]\s*1|3\s*[xX]\s*2|2 por 1|3 por 2|mitad de precio)\b/.test(t)) return 'oferta';
+    if (/(?:US\$|\$|€|£)\s*\d|\d[\d.,]*\s*(?:usd|eur|bs\.?|soles|pesos|mxn|ars|clp|d[oó]lares|euros)\b|\b(precio|cuesta|desde)\b/.test(t)) return 'precio';
+    if (/\b(whatsapp|wsp|tel[eé]fono|celular|ll[aá]manos|escr[ií]benos|cont[aá]ctanos|contacto|instagram|facebook)\b|@[a-z0-9_.]{3,}/.test(t)) return 'contacto';
+    if (/\b(av\.?|avenida|calle|local|direcci[oó]n|ubicaci[oó]n|estamos en|frente al?|esquina|a una cuadra)\b/.test(t)) return 'ubicacion';
+    if (/\b(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo|horario|abierto|abrimos|atendemos|de \d{1,2} a \d{1,2})\b/.test(t)) return 'horario';
+    if (/\b(reserva|reservas|compra|comprar|pide|pida|agenda|vis[ií]tanos|s[ií]guenos|inscr[ií]bete)\b/.test(t)) return 'cta';
+    if (/\b(servicios?|env[ií]os?|instalaci[oó]n|reparaci[oó]n|dise[nñ]o|mantenimiento|atenci[oó]n|delivery)\b/.test(t)) return 'servicio';
+
     if (/^\s*[-–•]?\s*\d/.test(texto)) return 'numero';
     if (/\bvs\.?\b|\bversus\b|\bfrente a\b|\bcontra\b/.test(t)) return 'comparar';
     if (/\?$/.test(texto.trim())) return 'idea';
@@ -69,15 +87,19 @@
     return AUTO[rotacion % AUTO.length];
   }
 
+  function partirItems(texto) {
+    var partes = String(texto).split(/\s*[|;·→]\s*|\s+\/\s+/).map(function (p) { return p.trim(); }).filter(Boolean);
+    if (partes.length < 2) {
+      partes = String(texto).split(/\s*,\s*/).map(function (p) { return p.trim(); }).filter(Boolean);
+    }
+    if (partes.length < 2) partes = [];
+    return partes.slice(0, 3);
+  }
+
   function extrasDe(texto, visual, indice) {
     var extra = {};
-    if (visual === 'pasos') {
-      var partes = texto.split(/\s*[|;·→]\s*|\s+\/\s+/).map(function (p) { return p.trim(); }).filter(Boolean);
-      if (partes.length < 2) {
-        partes = texto.split(/\s*,\s*/).map(function (p) { return p.trim(); }).filter(Boolean);
-      }
-      if (partes.length < 2) partes = [];
-      extra.items = partes.slice(0, 3);
+    if (visual === 'pasos' || visual === 'servicio') {
+      extra.items = partirItems(texto);
     }
     if (visual === 'comparar') {
       var m = texto.split(/\s+(?:vs\.?|versus|frente a|contra)\s+/i);
@@ -90,6 +112,15 @@
     if (visual === 'numero') {
       var n = String(texto).match(/-?\d+(?:[.,]\d+)?/);
       extra.numero = n ? n[0] : String(indice + 1);
+    }
+    if (visual === 'precio') {
+      var p = String(texto).match(/(?:US\$|\$|€|£)\s*\d[\d.,]*|\d[\d.,]*\s*(?:USD|EUR|Bs\.?|soles|pesos|MXN|ARS|CLP|dólares|dolares|euros)/i) ||
+        String(texto).match(/\d[\d.,]*/);
+      extra.precio = p ? p[0].replace(/\s+/g, ' ').trim() : '$';
+    }
+    if (visual === 'oferta') {
+      var o = String(texto).match(/\d+\s*%|\d+\s*[xX]\s*\d+|\b2 por 1\b|\b3 por 2\b/i);
+      extra.oferta = o ? o[0].replace(/\s*[xX]\s*/, '×').toUpperCase() : 'OFERTA';
     }
     if (visual === 'personaje') {
       extra.frase = String(texto).slice(0, 90);
@@ -123,6 +154,12 @@
       var palabras = resto.split(/\s+/).filter(Boolean).length;
       var dur = 1.15 + palabras / (2.5 * velocidad);
       dur = limitar(dur, 2.4, 9.5);
+
+      /* Si la voz natural ya se descargó, manda su duración real. */
+      var durVoz = opciones.duraciones && opciones.duraciones[escenas.length];
+      if (durVoz != null && isFinite(durVoz) && Number(durVoz) > 0.4) {
+        dur = Number(durVoz);
+      }
 
       escenas.push({
         texto: resto,
@@ -257,6 +294,11 @@
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'left';
     ctx.font = '800 ' + layout.tam + 'px ' + FUENTE;
+    if (pal.sombra) {
+      ctx.shadowColor = pal.sombra;
+      ctx.shadowBlur = layout.tam * 0.45;
+      ctx.shadowOffsetY = layout.tam * 0.05;
+    }
 
     layout.lineas.forEach(function (linea, li) {
       var x = xBase - linea.ancho / 2;
@@ -295,7 +337,7 @@
 
     ctx.save();
     ctx.globalAlpha = 0.9;
-    ctx.fillStyle = pal.acento;
+    ctx.fillStyle = pal.kicker || pal.acento;
     ctx.beginPath();
     ctx.arc(x + S * 0.008, y, S * 0.008, 0, Math.PI * 2);
     ctx.fill();
@@ -303,11 +345,11 @@
     ctx.font = '700 ' + Math.round(S * 0.027) + 'px ' + FUENTE;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = pal.acento;
+    ctx.fillStyle = pal.kicker || pal.acento;
     ctx.fillText(escena.etiqueta.toUpperCase(), x + S * 0.026, y);
 
     ctx.textAlign = 'right';
-    ctx.fillStyle = pal.suave;
+    ctx.fillStyle = pal.kickerSuave || pal.suave;
     ctx.globalAlpha = 0.75;
     var num = String(indice + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
     ctx.fillText(num, W - W * 0.085, y);
@@ -366,7 +408,7 @@
     ctx.globalAlpha *= alfa;
     ctx.translate(0, desplazamiento);
     if (global.Dibujos) global.Dibujos.pintar(ctx, W, H, escena, p, paleta, tiempo, personaje);
-    if (!usaGlobo) dibujarTexto(ctx, W, H, escena, p, pal, layout);
+    if (!usaGlobo && escena.visual !== 'cta') dibujarTexto(ctx, W, H, escena, p, pal, layout);
     ctx.restore();
   }
 

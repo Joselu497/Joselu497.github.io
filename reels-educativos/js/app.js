@@ -11,6 +11,7 @@
     guion: $('guion'),
     contador: $('contador'),
     chips: $('chips-visuales'),
+    tematicas: $('tematicas'),
     formato: $('formato'),
     calidad: $('calidad'),
     paleta: $('paleta'),
@@ -23,7 +24,9 @@
     narracion: $('narracion'),
     volumen: $('volumen'),
     volumenValor: $('volumen-valor'),
-    microfono: $('microfono'),
+    voz: $('voz'),
+    btnProbarVoz: $('btn-probar-voz'),
+    notaVoz: $('nota-voz'),
     btnPlay: $('btn-play'),
     btnEjemplo: $('btn-ejemplo'),
     btnGenerar: $('btn-generar'),
@@ -65,7 +68,8 @@
     marca: '',
     progreso: true,
     volumen: 0.35,
-    microfono: false
+    voz: 'ninguna',
+    tematica: 'educativo'
   };
 
   var archivos = { musica: null, narracion: null };
@@ -93,6 +97,104 @@
     '#personaje ¡Tú puedes! Cuida las plantas'
   ].join('\n');
 
+  var TEMATICAS = [
+    {
+      id: 'educativo',
+      nombre: 'Educativo',
+      paleta: 'pizarra',
+      personaje: 'buho',
+      ritmo: 1,
+      voz: 'ninguna',
+      guion: EJEMPLO
+    },
+    {
+      id: 'anuncio',
+      nombre: 'Anuncio',
+      paleta: 'aero',
+      personaje: 'nube',
+      ritmo: 1,
+      voz: 'natural',
+      guion: [
+        '#personaje ¡Tu negocio merece brillar!',
+        '#servicio Diseño | Instalación | Mantenimiento',
+        '#oferta 20% de descuento esta semana',
+        '#precio Desde $49',
+        '#horario De lunes a sábado, de 9 a 19',
+        '#contacto WhatsApp 555 123 4567',
+        '#ubicacion Av. Central 123, frente al parque',
+        '#cta ¡Escríbenos y reserva hoy!'
+      ].join('\n')
+    },
+    {
+      id: 'omnibus',
+      nombre: 'Agencia de buses',
+      paleta: 'aero',
+      personaje: 'buho',
+      ritmo: 1.05,
+      voz: 'natural',
+      guion: [
+        '#personaje ¡Viaja cómodo y seguro!',
+        '#servicio Salidas diarias | Asientos reclinables | Wi-Fi a bordo',
+        '#horario Salidas cada hora, de 6 a 22',
+        '#precio Pasaje desde $8',
+        '#oferta 2x1 los martes',
+        '#ubicacion Terminal Central, Av. Libertad 450',
+        '#contacto Reservas al WhatsApp 555 987 654',
+        '#cta ¡Compra tu boleto hoy!'
+      ].join('\n')
+    },
+    {
+      id: 'tienda',
+      nombre: 'Tienda de decoración',
+      paleta: 'aero',
+      personaje: 'planta',
+      ritmo: 0.95,
+      voz: 'natural',
+      guion: [
+        '#personaje ¡Dale vida a tu hogar!',
+        '#servicio Lámparas | Cojines | Cuadros | Plantas',
+        '#precio Desde $12',
+        '#oferta 25% en toda la tienda',
+        '#horario Abierto de 10 a 20, todos los días',
+        '#ubicacion Calle Flores 78, local 3',
+        '#contacto WhatsApp 555 222 3333',
+        '#cta ¡Ven a decorar con nosotros!'
+      ].join('\n')
+    },
+    {
+      id: 'oferta',
+      nombre: 'Oferta relámpago',
+      paleta: 'neon',
+      personaje: 'gato',
+      ritmo: 1.1,
+      voz: 'natural',
+      guion: [
+        '#personaje ¡Solo por hoy!',
+        '#oferta 50% de descuento',
+        '#precio Todo desde $5',
+        '#servicio Envío gratis | Pago seguro | Cambios sin costo',
+        '#horario Hasta las 10 de la noche',
+        '#cta Pide ya por WhatsApp'
+      ].join('\n')
+    },
+    {
+      id: 'evento',
+      nombre: 'Evento',
+      paleta: 'papel',
+      personaje: 'gato',
+      ritmo: 1,
+      voz: 'natural',
+      guion: [
+        '#personaje ¡Te esperamos!',
+        '#idea Feria de emprendedores',
+        '#horario Sábado 15, de 10 a 18',
+        '#ubicacion Plaza Mayor, entrada libre',
+        '#servicio Comida | Música | Artesanías',
+        '#cta ¡Invita a tus amigos!'
+      ].join('\n')
+    }
+  ];
+
   /* ---------- utilidades ---------- */
 
   function avisar(txt, ms) {
@@ -114,7 +216,8 @@
         marca: estado.marca,
         progreso: estado.progreso,
         volumen: estado.volumen,
-        microfono: estado.microfono
+        voz: estado.voz,
+        tematica: estado.tematica
       }));
     } catch (e) { /* almacenamiento no disponible */ }
   }
@@ -135,7 +238,15 @@
       if (Number(datos.ritmo)) estado.ritmo = Number(datos.ritmo);
       if (Number(datos.volumen) >= 0) estado.volumen = Number(datos.volumen);
       if (typeof datos.progreso === 'boolean') estado.progreso = datos.progreso;
-      if (typeof datos.microfono === 'boolean') estado.microfono = datos.microfono;
+      var vocesValidas = ['ninguna', 'natural', 'natural-mx', 'mic'];
+      if (typeof datos.voz === 'string' && vocesValidas.indexOf(datos.voz) >= 0) {
+        estado.voz = datos.voz;
+      } else if (datos.microfono === true) {
+        estado.voz = 'mic';
+      }
+      if (typeof datos.tematica === 'string' && TEMATICAS.some(function (t) { return t.id === datos.tematica; })) {
+        estado.tematica = datos.tematica;
+      }
     } catch (e) { /* ignorar */ }
   }
 
@@ -158,7 +269,8 @@
     el.progreso.checked = estado.progreso;
     el.volumen.value = estado.volumen;
     el.volumenValor.textContent = Math.round(estado.volumen * 100) + '%';
-    el.microfono.checked = estado.microfono;
+    if (el.voz) el.voz.value = estado.voz;
+    actualizarVozUI();
   }
 
   function opciones() {
@@ -237,6 +349,11 @@
     estado.guion = el.guion.value;
     guardar();
     reanalizar();
+    var coincide = null;
+    TEMATICAS.forEach(function (t) {
+      if (t.guion.trim() === estado.guion.trim()) coincide = t.id;
+    });
+    marcarTematica(coincide);
   }
 
   function insertarPrefijo(prefijo) {
@@ -254,6 +371,95 @@
     ta.focus();
     try { ta.setSelectionRange(pos, pos); } catch (e) { /* ignorar */ }
     entradaGuion();
+  }
+
+  function idiomaVoz() {
+    return estado.voz === 'natural-mx' ? 'es-mx' : 'es';
+  }
+
+  function actualizarVozUI() {
+    if (!el.voz) return;
+    var natural = estado.voz === 'natural' || estado.voz === 'natural-mx';
+    if (el.btnProbarVoz) el.btnProbarVoz.hidden = !natural;
+    if (!el.notaVoz) return;
+    if (natural) {
+      el.notaVoz.textContent = 'Voz de Google, gratis. Se descarga una vez por frase y queda guardada en tu teléfono. Necesita internet al generar.';
+    } else if (estado.voz === 'mic') {
+      el.notaVoz.textContent = 'Narra mientras corre la animación. El navegador pedirá permiso para el micrófono al generar.';
+    } else {
+      el.notaVoz.textContent = 'Sin voz. Puedes añadir música de fondo o una narración grabada.';
+    }
+  }
+
+  function marcarTematica(id) {
+    if (!el.tematicas) return;
+    Array.prototype.forEach.call(el.tematicas.children, function (b) {
+      b.classList.toggle('activo', b.getAttribute('data-id') === id);
+    });
+    if (id) estado.tematica = id;
+  }
+
+  function aplicarTematica(t) {
+    if (estado.guion.trim() && estado.guion.trim() !== t.guion.trim()) {
+      if (!window.confirm('¿Reemplazar el guion actual por la temática «' + t.nombre + '»?')) return;
+    }
+    estado.guion = t.guion;
+    estado.paleta = t.paleta;
+    estado.personaje = t.personaje;
+    estado.ritmo = t.ritmo;
+    estado.voz = t.voz;
+    estado.tematica = t.id;
+    guardar();
+    aplicarControles();
+    redimensionar();
+    reanalizar();
+    marcarTematica(t.id);
+    el.guion.scrollTop = 0;
+    avisar('Temática «' + t.nombre + '» lista. Pulsa Generar video.');
+  }
+
+  function crearTematicas() {
+    if (!el.tematicas) return;
+    TEMATICAS.forEach(function (t) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip tematica';
+      b.setAttribute('data-id', t.id);
+      b.textContent = t.nombre;
+      b.addEventListener('click', function () { aplicarTematica(t); });
+      el.tematicas.appendChild(b);
+    });
+    marcarTematica(estado.tematica);
+  }
+
+  function probarVoz() {
+    if (!window.Voz) {
+      avisar('La voz natural no está disponible en este navegador.');
+      return;
+    }
+    var texto = (videoEstado && videoEstado.escenas[0] && videoEstado.escenas[0].texto) ||
+      'Hola, esta es una prueba de voz natural para tus videos.';
+    el.btnProbarVoz.disabled = true;
+    var original = el.btnProbarVoz.textContent;
+    el.btnProbarVoz.textContent = 'Descargando voz…';
+
+    Voz.probar(texto, { idioma: idiomaVoz() }).then(function (blob) {
+      var url = URL.createObjectURL(blob);
+      var audio = new Audio(url);
+      audio.onended = function () {
+        try { URL.revokeObjectURL(url); } catch (e) { /* ignorar */ }
+      };
+      audio.onerror = function () {
+        try { URL.revokeObjectURL(url); } catch (e) { /* ignorar */ }
+      };
+      return audio.play();
+    }).catch(function (e) {
+      console.warn('Prueba de voz:', e);
+      avisar('No se pudo descargar la voz. Revisa tu conexión e inténtalo otra vez.', 6200);
+    }).then(function () {
+      el.btnProbarVoz.disabled = false;
+      el.btnProbarVoz.textContent = original;
+    });
   }
 
   function crearOpcionesPersonaje() {
@@ -415,22 +621,65 @@
 
     el.capaGrabacion.hidden = false;
     el.capaGrabacion.classList.remove('grabando');
-    el.cuenta.hidden = false;
-    el.cuenta.textContent = '3';
+    el.cuenta.hidden = true;
+    el.cuenta.textContent = '';
     el.cuenta.classList.remove('pulso');
     el.estadoGrabacion.textContent = 'Preparando audio…';
-    el.btnCancelar.hidden = true;
+    el.btnCancelar.hidden = false;
     el.barraGrabacion.style.width = '0%';
     el.btnGenerar.disabled = true;
     el.btnPlay.hidden = true;
 
     try {
+      var vozNatural = estado.voz === 'natural' || estado.voz === 'natural-mx';
+      var vozData = null;
+
+      if (vozNatural) {
+        if (!window.Voz) {
+          avisar('La voz natural no está disponible; el video se grabará sin voz.', 6000);
+        } else {
+          el.estadoGrabacion.textContent = 'Descargando la voz natural…';
+          try {
+            vozData = await Voz.paraEscenas(videoEstado.escenas, {
+              idioma: idiomaVoz(),
+              velocidad: estado.ritmo,
+              senal: senal,
+              alEstado: function (txt) { el.estadoGrabacion.textContent = txt; },
+              alProgreso: function (f) { el.barraGrabacion.style.width = (f * 100).toFixed(1) + '%'; }
+            });
+            videoEstado = Motor.crearEstado(estado.guion, Object.assign({}, opciones(), {
+              duraciones: vozData.duraciones
+            }));
+            tPreview = 0;
+            dibujar(0);
+            el.barraGrabacion.style.width = '0%';
+          } catch (e) {
+            if (senal.cancelado) throw e;
+            console.error('Voz natural:', e);
+            vozData = null;
+            avisar('No se pudo descargar la voz natural. El video se grabará sin voz.', 6200);
+          }
+        }
+      }
+
+      var voces = null;
+      if (vozData && vozData.voces) {
+        voces = vozData.voces.map(function (v, i) {
+          return {
+            trozos: v.trozos,
+            tasa: v.tasa,
+            inicio: videoEstado.escenas[i] ? videoEstado.escenas[i].inicio : 0
+          };
+        });
+      }
+
       var res = await Grabador.grabar(el.lienzo, {
         duracion: videoEstado.duracion,
         calidad: videoEstado.opciones.calidad,
         musica: archivos.musica,
         narracion: archivos.narracion,
-        microfono: estado.microfono,
+        microfono: estado.voz === 'mic',
+        voces: voces,
         volumen: estado.volumen,
         senal: senal,
         alCuenta: alCuenta,
@@ -485,6 +734,9 @@
     }
     if (location.protocol === 'file:') {
       partes.push('Modo archivo local: el micrófono puede funcionar, pero la instalación como app requiere https://.');
+    }
+    if (window.Voz) {
+      partes.push('La voz natural usa internet solo al generar y queda guardada para la próxima vez.');
     }
     el.notaSoporte.textContent = partes.join(' ');
   }
@@ -588,11 +840,20 @@
       guardar();
     });
 
-    el.microfono.addEventListener('change', function () {
-      estado.microfono = el.microfono.checked;
-      guardar();
-      if (estado.microfono) avisar('El micrófono se pedirá al generar. Narra durante la animación.');
-    });
+    if (el.voz) {
+      el.voz.addEventListener('change', function () {
+        estado.voz = el.voz.value;
+        guardar();
+        actualizarVozUI();
+        if (estado.voz === 'mic') {
+          avisar('El micrófono se pedirá al generar. Narra durante la animación.');
+        } else if (estado.voz.indexOf('natural') === 0) {
+          avisar('Voz natural activada. Se descargará al generar el video.', 4200);
+        }
+      });
+    }
+
+    if (el.btnProbarVoz) el.btnProbarVoz.addEventListener('click', probarVoz);
 
     el.musica.addEventListener('change', function () {
       archivos.musica = el.musica.files && el.musica.files[0] ? el.musica.files[0] : null;
@@ -669,6 +930,7 @@
     recuperar();
     aplicarControles();
     crearChips();
+    crearTematicas();
     crearAyuda();
     redimensionar();
     try {

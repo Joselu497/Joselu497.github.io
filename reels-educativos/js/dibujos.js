@@ -37,6 +37,14 @@
       fondo: '#0a0618', fondo2: '#170b31', panel: '#1e1142',
       tinta: '#f4eeff', acento: '#b388ff', acento2: '#00e5ff',
       suave: '#937fc0', tenue: 'rgba(244,238,255,0.16)', oscuro: true
+    },
+    aero: {
+      nombre: 'Frutiger Aero',
+      fondo: '#cfeeff', fondo2: '#05406d', panel: '#0a4a74',
+      tinta: '#f4fdff', acento: '#9cf3ff', acento2: '#6cf7a6',
+      suave: '#cdefff', tenue: 'rgba(255,255,255,0.24)', oscuro: true,
+      aero: true, kicker: '#075a88', kickerSuave: '#0a527d',
+      sombra: 'rgba(3,45,75,0.55)'
     }
   };
 
@@ -166,19 +174,173 @@
     return cv;
   }
 
+  /* Burbuja glossy: burbuja de jabón con brillo y borde de cristal. */
+  function burbuja(g, x, y, r, alfa) {
+    if (r < 0.6) return;
+    var gr = g.createRadialGradient(x - r * 0.34, y - r * 0.40, r * 0.04, x, y, r);
+    gr.addColorStop(0, 'rgba(255,255,255,0.92)');
+    gr.addColorStop(0.28, 'rgba(255,255,255,0.16)');
+    gr.addColorStop(0.68, 'rgba(150,235,255,0.10)');
+    gr.addColorStop(1, 'rgba(255,255,255,0.38)');
+
+    g.save();
+    g.globalAlpha = alfa;
+    g.fillStyle = gr;
+    g.beginPath();
+    g.arc(x, y, r, 0, TAU);
+    g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.55)';
+    g.lineWidth = Math.max(0.8, r * 0.055);
+    g.stroke();
+
+    g.globalAlpha = alfa * 0.9;
+    g.fillStyle = 'rgba(255,255,255,0.85)';
+    g.beginPath();
+    g.ellipse(x - r * 0.32, y - r * 0.38, r * 0.20, r * 0.12, -0.5, 0, TAU);
+    g.fill();
+    g.restore();
+  }
+
+  /* Fondo Frutiger Aero: cielo y agua brillantes, horizonte, cristal y burbujas. */
+  function crearFondoAero(W, H, pal) {
+    var cv = document.createElement('canvas');
+    cv.width = W;
+    cv.height = H;
+    var g = cv.getContext('2d');
+    var S = Math.min(W, H);
+
+    var cielo = g.createLinearGradient(0, 0, 0, H);
+    cielo.addColorStop(0, '#e2f9ff');
+    cielo.addColorStop(0.16, '#a9e9ff');
+    cielo.addColorStop(0.34, '#6bd2f4');
+    cielo.addColorStop(0.47, '#33b0e2');
+    cielo.addColorStop(0.52, '#1c93cb');
+    cielo.addColorStop(0.53, '#117fb8');
+    cielo.addColorStop(0.74, '#0a639c');
+    cielo.addColorStop(0.90, '#074d7f');
+    cielo.addColorStop(1, '#043458');
+    g.fillStyle = cielo;
+    g.fillRect(0, 0, W, H);
+
+    var sol = g.createRadialGradient(W * 0.28, H * 0.06, 0, W * 0.28, H * 0.06, Math.max(W, H) * 0.72);
+    sol.addColorStop(0, 'rgba(255,255,255,0.95)');
+    sol.addColorStop(0.28, 'rgba(255,255,255,0.42)');
+    sol.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = sol;
+    g.fillRect(0, 0, W, H);
+
+    /* Colina verde brillante en el horizonte. */
+    var yHorizonte = H * 0.505;
+    var colina = g.createLinearGradient(0, yHorizonte - H * 0.06, 0, H * 0.62);
+    colina.addColorStop(0, 'rgba(190,255,214,0.92)');
+    colina.addColorStop(0.45, 'rgba(104,230,150,0.86)');
+    colina.addColorStop(1, 'rgba(32,150,96,0.55)');
+    g.beginPath();
+    g.moveTo(0, H * 0.56);
+    g.bezierCurveTo(W * 0.18, H * 0.49, W * 0.36, H * 0.52, W * 0.52, H * 0.545);
+    g.bezierCurveTo(W * 0.70, H * 0.57, W * 0.84, H * 0.515, W, H * 0.535);
+    g.lineTo(W, H * 0.63);
+    g.lineTo(0, H * 0.63);
+    g.closePath();
+    g.fillStyle = colina;
+    g.fill();
+
+    /* Brillo de agua y reflejos horizontales. */
+    var agua = g.createLinearGradient(0, H * 0.55, 0, H);
+    agua.addColorStop(0, 'rgba(255,255,255,0.20)');
+    agua.addColorStop(0.18, 'rgba(180,245,255,0.06)');
+    agua.addColorStop(1, 'rgba(0,32,64,0.35)');
+    g.fillStyle = agua;
+    g.fillRect(0, H * 0.55, W, H * 0.45);
+
+    g.save();
+    g.globalAlpha = 0.22;
+    g.strokeStyle = '#ffffff';
+    g.lineWidth = Math.max(1, S * 0.0022);
+    for (var r = 0; r < 9; r++) {
+      var ry = H * (0.575 + r * 0.043);
+      var ancho = W * (0.10 + (r % 4) * 0.085);
+      var bx = W * (0.16 + ((r * 0.23) % 0.66));
+      g.beginPath();
+      g.moveTo(bx - ancho / 2, ry);
+      g.lineTo(bx + ancho / 2, ry);
+      g.stroke();
+    }
+    g.restore();
+
+    /* Franjas de cristal inclinadas. */
+    g.save();
+    g.globalAlpha = 0.16;
+    g.fillStyle = '#ffffff';
+    g.beginPath();
+    g.moveTo(W * 0.02, -H * 0.05);
+    g.lineTo(W * 0.30, -H * 0.05);
+    g.lineTo(W * 0.06, H * 0.55);
+    g.lineTo(-W * 0.16, H * 0.55);
+    g.closePath();
+    g.fill();
+    g.globalAlpha = 0.09;
+    g.beginPath();
+    g.moveTo(W * 0.38, -H * 0.05);
+    g.lineTo(W * 0.48, -H * 0.05);
+    g.lineTo(W * 0.26, H * 0.46);
+    g.lineTo(W * 0.16, H * 0.46);
+    g.closePath();
+    g.fill();
+    g.restore();
+
+    /* Burbujas fijas. */
+    var burbujas = [
+      [0.11, 0.24, 0.030, 0.55], [0.82, 0.17, 0.045, 0.42], [0.68, 0.36, 0.020, 0.55],
+      [0.24, 0.44, 0.022, 0.45], [0.90, 0.42, 0.026, 0.40], [0.52, 0.14, 0.016, 0.50],
+      [0.16, 0.62, 0.034, 0.32], [0.76, 0.66, 0.022, 0.30], [0.42, 0.70, 0.018, 0.28],
+      [0.88, 0.80, 0.028, 0.24], [0.09, 0.86, 0.020, 0.22], [0.60, 0.90, 0.034, 0.20]
+    ];
+    burbujas.forEach(function (b) {
+      burbuja(g, W * b[0], H * b[1], S * b[2], b[3]);
+    });
+
+    return cv;
+  }
+
   function fondo(ctx, W, H, nombre, tiempo) {
     var pal = PALETAS[nombre] || PALETAS.pizarra;
     var llave = W + 'x' + H + '-' + nombre;
     var cv = cacheFondo.get(llave);
     if (!cv) {
       if (cacheFondo.size > 6) { cacheFondo.clear(); }
-      cv = crearFondo(W, H, pal);
+      cv = pal.aero ? crearFondoAero(W, H, pal) : crearFondo(W, H, pal);
       cacheFondo.set(llave, cv);
     }
     ctx.drawImage(cv, 0, 0, W, H);
 
     var S = Math.min(W, H);
     var t = tiempo || 0;
+
+    if (pal.aero) {
+      ctx.save();
+      for (var b = 0; b < 10; b++) {
+        var vel = 0.012 + (b % 3) * 0.006;
+        var subida = (t * vel + b * 0.107) % 1;
+        var by = H * (0.98 - subida * 0.94);
+        var bx = W * (0.08 + ((b * 0.173 + Math.sin(t * 0.12 + b) * 0.018) % 0.84));
+        var r = S * (0.008 + (b % 4) * 0.006);
+        burbuja(ctx, bx, by, r, 0.30 + (b % 3) * 0.10);
+      }
+      ctx.globalAlpha = 0.10;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = Math.max(1, S * 0.003);
+      for (var i = 0; i < 2; i++) {
+        var yy = H * (0.30 + 0.36 * i) + Math.sin(t * 0.10 + i * 1.7) * S * 0.01;
+        ctx.beginPath();
+        ctx.moveTo(W * 0.10, yy);
+        ctx.bezierCurveTo(W * 0.34, yy - S * 0.02, W * 0.66, yy + S * 0.02, W * 0.90, yy);
+        ctx.stroke();
+      }
+      ctx.restore();
+      return;
+    }
+
     ctx.save();
     ctx.globalAlpha = pal.oscuro ? 0.055 : 0.05;
     ctx.strokeStyle = pal.acento;
@@ -1538,7 +1700,345 @@
     ctx.restore();
   }
 
+  /* ---------- formas para anuncios y negocios ---------- */
+
+  function destellos(ctx, R, e, c, tiempo) {
+    for (var i = 0; i < 6; i++) {
+      var a = tiempo * 0.55 + i * (TAU / 6);
+      var rr = R * (0.88 + 0.05 * Math.sin(tiempo * 1.2 + i));
+      var pi = limitar((e - 0.42 - i * 0.04) * 2.4, 0, 1);
+      if (pi <= 0) continue;
+      var s = R * 0.032;
+      ctx.save();
+      ctx.globalAlpha = pi * 0.85;
+      ctx.fillStyle = i % 2 ? c.acento2 : c.acento;
+      ctx.translate(Math.cos(a) * rr, Math.sin(a) * rr * 0.9);
+      ctx.rotate(a);
+      ctx.beginPath();
+      ctx.moveTo(0, -s * 2.3);
+      ctx.lineTo(s * 0.5, -s * 0.5);
+      ctx.lineTo(s * 2.3, 0);
+      ctx.lineTo(s * 0.5, s * 0.5);
+      ctx.lineTo(0, s * 2.3);
+      ctx.lineTo(-s * 0.5, s * 0.5);
+      ctx.lineTo(-s * 2.3, 0);
+      ctx.lineTo(-s * 0.5, -s * 0.5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function dibujarPrecio(ctx, R, p, c, escena, tiempo) {
+    var e = suave(p);
+    var texto = String((escena.extra && escena.extra.precio) || '$');
+    var w = R * 1.46;
+    var h = R * 0.68;
+    var esc = 0.86 + 0.14 * suave(limitar(e * 1.6, 0, 1));
+
+    ctx.save();
+    ctx.translate(0, R * 0.02);
+    ctx.rotate(-0.05 + 0.03 * Math.sin(tiempo * 0.9));
+    ctx.scale(esc, esc);
+    ctx.globalAlpha = limitar(e * 2.4, 0, 1);
+
+    ctx.save();
+    ctx.globalAlpha = 0.18 * e;
+    caja(ctx, -w / 2 - R * 0.04, -h / 2 - R * 0.04, w + R * 0.08, h + R * 0.08, R * 0.2, c.acento);
+    ctx.restore();
+
+    caja(ctx, -w / 2, -h / 2, w, h, R * 0.15, c.panel, c.acento, R * 0.025);
+
+    ctx.save();
+    ctx.fillStyle = c.tenue;
+    ctx.beginPath();
+    ctx.arc(-w / 2 + R * 0.16, 0, R * 0.042, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+
+    var tam = R * 0.42;
+    if (texto.length > 4) tam = R * 0.32;
+    if (texto.length > 7) tam = R * 0.25;
+    rotulo(ctx, texto, R * 0.05, R * 0.008, tam, c.acento, '800');
+    ctx.restore();
+
+    destellos(ctx, R, e, c, tiempo);
+  }
+
+  function dibujarOferta(ctx, R, p, c, escena, tiempo) {
+    var e = suave(p);
+    var texto = String((escena.extra && escena.extra.oferta) || '%');
+    var r = R * 0.62;
+    var puntas = 13;
+
+    ctx.save();
+    ctx.translate(0, R * 0.01);
+    ctx.rotate(0.1 * Math.sin(tiempo * 0.6));
+    var esc = 0.6 + 0.4 * suave(limitar(e * 1.6, 0, 1));
+    ctx.scale(esc, esc);
+    ctx.globalAlpha = limitar(e * 2.2, 0, 1) * 0.94;
+
+    var g = ctx.createRadialGradient(0, -r * 0.25, r * 0.12, 0, 0, r * 1.15);
+    g.addColorStop(0, c.acento2);
+    g.addColorStop(1, c.acento);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    for (var i = 0; i < puntas * 2; i++) {
+      var a = (i / (puntas * 2)) * TAU - Math.PI / 2;
+      var rr = i % 2 ? r * 0.78 : r * 1.05;
+      var x = Math.cos(a) * rr;
+      var y = Math.sin(a) * rr;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    circuloTrazo(ctx, 0, R * 0.01, r * 0.70, c.oscuro ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.5)',
+      R * 0.012, limitar((e - 0.3) * 2, 0, 1));
+
+    var tam = R * 0.44;
+    if (texto.length > 3) tam = R * 0.35;
+    if (texto.length > 5) tam = R * 0.27;
+    rotulo(ctx, texto, 0, R * 0.012, tam, c.oscuro ? '#08101f' : '#fffdf8', '800');
+
+    destellos(ctx, R, e, c, tiempo);
+  }
+
+  function dibujarServicio(ctx, R, p, c, escena, tiempo) {
+    var e = suave(p);
+    var items = (escena.extra && escena.extra.items) || [];
+    if (!items.length) items = [recortar(escena.texto || 'Servicios', 18)];
+    items = items.slice(0, 3);
+
+    var alto = R * 0.25;
+    var ancho = R * 1.74;
+    var sep = alto * 1.34;
+    var y0 = -((items.length - 1) * sep) / 2;
+
+    items.forEach(function (txt, i) {
+      var pi = limitar((e - i * 0.16) * 2.6, 0, 1);
+      if (pi <= 0) return;
+      var despl = (1 - suave(pi)) * R * 0.2;
+      ctx.save();
+      ctx.globalAlpha = pi;
+      ctx.translate(-despl, y0 + i * sep);
+      caja(ctx, -ancho / 2, -alto / 2, ancho, alto, alto * 0.5, c.panel, c.tenue, R * 0.012);
+
+      var cx = -ancho / 2 + alto * 0.58;
+      ctx.fillStyle = c.acento;
+      ctx.beginPath();
+      ctx.arc(cx, 0, alto * 0.30, 0, TAU);
+      ctx.fill();
+      ctx.strokeStyle = c.oscuro ? '#07101f' : '#fffdf8';
+      ctx.lineWidth = alto * 0.09;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(cx - alto * 0.13, 0);
+      ctx.lineTo(cx - alto * 0.02, alto * 0.11);
+      ctx.lineTo(cx + alto * 0.16, -alto * 0.11);
+      ctx.stroke();
+
+      rotulo(ctx, recortar(txt, 24), -ancho / 2 + alto * 1.08, R * 0.004, alto * 0.38, c.tinta, '700', 'left');
+      ctx.restore();
+    });
+  }
+
+  function dibujarHorario(ctx, R, p, c, escena, tiempo) {
+    var e = suave(p);
+    var r = R * 0.58;
+
+    ctx.save();
+    ctx.globalAlpha = 0.12 * e;
+    ctx.fillStyle = c.acento;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+
+    circuloTrazo(ctx, 0, 0, r, c.tenue, R * 0.026, 1);
+    circuloTrazo(ctx, 0, 0, r, c.acento, R * 0.042, limitar(e * 1.2, 0, 1), -Math.PI / 2, -Math.PI / 2 + TAU * 0.92);
+
+    for (var i = 0; i < 12; i++) {
+      var a = (i / 12) * TAU - Math.PI / 2;
+      var pt = limitar((e - 0.18 - i * 0.02) * 3, 0, 1);
+      ctx.save();
+      ctx.globalAlpha = pt * (i % 3 === 0 ? 1 : 0.5);
+      ctx.strokeStyle = i % 3 === 0 ? c.acento2 : c.suave;
+      ctx.lineWidth = R * 0.013;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a) * r * 0.80, Math.sin(a) * r * 0.80);
+      ctx.lineTo(Math.cos(a) * r * 0.89, Math.sin(a) * r * 0.89);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    var avance = suave(limitar((e - 0.25) * 1.7, 0, 1));
+    var angHora = -Math.PI / 2 + (9.5 / 12) * TAU * avance;
+    var angMin = -Math.PI / 2 + (6 / 12) * TAU * avance;
+
+    ctx.save();
+    ctx.strokeStyle = c.tinta;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = R * 0.05;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(Math.cos(angHora) * r * 0.48, Math.sin(angHora) * r * 0.48);
+    ctx.stroke();
+    ctx.lineWidth = R * 0.028;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(Math.cos(angMin) * r * 0.72, Math.sin(angMin) * r * 0.72);
+    ctx.stroke();
+    ctx.fillStyle = c.acento2;
+    ctx.beginPath();
+    ctx.arc(0, 0, R * 0.045, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function dibujarContacto(ctx, R, p, c, escena, tiempo) {
+    var e = suave(p);
+    var w = R * 0.82;
+    var h = R * 1.30;
+    var esc = 0.84 + 0.16 * suave(limitar(e * 1.5, 0, 1));
+
+    ctx.save();
+    ctx.translate(0, R * 0.03);
+    ctx.scale(esc, esc);
+    ctx.globalAlpha = limitar(e * 2.2, 0, 1);
+
+    caja(ctx, -w / 2, -h / 2, w, h, R * 0.15, c.panel, c.acento, R * 0.024);
+    caja(ctx, -w / 2 + R * 0.05, -h / 2 + R * 0.11, w - R * 0.1, h - R * 0.22, R * 0.07,
+      c.oscuro ? 'rgba(0,0,0,0.32)' : 'rgba(255,255,255,0.62)');
+
+    ctx.globalAlpha = limitar((e - 0.28) * 3, 0, 1);
+    caja(ctx, -w * 0.31, -h * 0.31, w * 0.58, h * 0.19, R * 0.06, c.acento);
+    ctx.globalAlpha = limitar((e - 0.48) * 3, 0, 1);
+    caja(ctx, -w * 0.06, -h * 0.04, w * 0.36, h * 0.16, R * 0.05, c.acento2);
+    ctx.globalAlpha = limitar((e - 0.62) * 3, 0, 1);
+    caja(ctx, -w * 0.31, h * 0.19, w * 0.44, h * 0.14, R * 0.045, c.acento);
+
+    ctx.globalAlpha = limitar(e * 2, 0, 1);
+    caja(ctx, -w * 0.13, -h / 2 + R * 0.04, w * 0.26, R * 0.022, R * 0.011, c.suave);
+    ctx.restore();
+
+    for (var i = 0; i < 3; i++) {
+      var pi = limitar((e - 0.5 - i * 0.12) * 2, 0, 1);
+      if (pi <= 0) continue;
+      ctx.save();
+      ctx.globalAlpha = pi * (0.9 - i * 0.22);
+      ctx.strokeStyle = c.acento;
+      ctx.lineWidth = R * 0.017;
+      ctx.beginPath();
+      ctx.arc(w * 0.44, -h * 0.30, R * (0.11 + i * 0.10), 0, TAU);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function dibujarUbicacion(ctx, R, p, c, escena, tiempo) {
+    var e = suave(p);
+    var caida = (1 - suave(limitar(e * 1.9, 0, 1))) * -R * 0.42;
+
+    for (var i = 0; i < 3; i++) {
+      var pi = limitar((e - 0.4 - i * 0.14) * 2.2, 0, 1);
+      if (pi <= 0) continue;
+      ctx.save();
+      ctx.globalAlpha = (1 - pi) * 0.85;
+      ctx.strokeStyle = c.acento;
+      ctx.lineWidth = R * 0.018;
+      ctx.beginPath();
+      ctx.ellipse(0, R * 0.62, R * (0.22 + pi * 0.44), R * (0.08 + pi * 0.15), 0, 0, TAU);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.translate(0, caida);
+    ctx.globalAlpha = limitar(e * 2.6, 0, 1);
+
+    var g = ctx.createLinearGradient(0, -R * 0.5, 0, R * 0.5);
+    g.addColorStop(0, c.acento);
+    g.addColorStop(1, c.acento2);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, -R * 0.14, R * 0.35, Math.PI * 0.78, Math.PI * 2.22);
+    ctx.lineTo(0, R * 0.50);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = c.panel;
+    ctx.beginPath();
+    ctx.arc(0, -R * 0.14, R * 0.145, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function dibujarCta(ctx, R, p, c, escena, tiempo) {
+    var e = suave(p);
+    var frase = recortar(String(escena.texto || '¡Reserva ya!'), 60);
+    var maxAncho = R * 1.74;
+    var tam = R * 0.19;
+    var lineas = envolverEnLineas(ctx, frase, maxAncho, tam);
+    var vueltas = 0;
+    while (lineas.length > 3 && vueltas < 6) {
+      tam *= 0.88;
+      lineas = envolverEnLineas(ctx, frase, maxAncho, tam);
+      vueltas++;
+    }
+    if (lineas.length > 3) lineas = lineas.slice(0, 3);
+
+    ctx.save();
+    ctx.font = '800 ' + tam + 'px ' + FUENTE;
+    var anchoTexto = 0;
+    lineas.forEach(function (l) { anchoTexto = Math.max(anchoTexto, ctx.measureText(l).width); });
+    ctx.restore();
+
+    var padX = tam * 1.25;
+    var padY = tam * 0.9;
+    var w = anchoTexto + padX * 2;
+    var h = lineas.length * tam * 1.22 + padY * 2;
+    var esc = 0.8 + 0.2 * suave(limitar(e * 1.5, 0, 1));
+
+    var pulso = (tiempo * 0.85) % 1;
+    ctx.save();
+    ctx.globalAlpha = (1 - pulso) * 0.20 * e;
+    caja(ctx, -w / 2 - pulso * R * 0.18, -h / 2 - pulso * R * 0.18,
+      w + pulso * R * 0.36, h + pulso * R * 0.36, h / 2 + pulso * R * 0.18, c.acento);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(0, R * 0.02);
+    ctx.scale(esc, esc);
+    ctx.globalAlpha = limitar(e * 2.4, 0, 1);
+    var g = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
+    g.addColorStop(0, c.acento);
+    g.addColorStop(1, c.acento2);
+    caja(ctx, -w / 2, -h / 2, w, h, h / 2, g);
+    ctx.restore();
+
+    ctx.save();
+    ctx.globalAlpha = limitar((e - 0.22) * 2.6, 0, 1);
+    ctx.font = '800 ' + tam + 'px ' + FUENTE;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = c.oscuro ? '#08101f' : '#fffdf8';
+    var yIni = R * 0.02 - (lineas.length - 1) * tam * 0.61;
+    lineas.forEach(function (l, i) { ctx.fillText(l, 0, yIni + i * tam * 1.22); });
+    ctx.restore();
+  }
+
   var FORMAS = {
+    precio: dibujarPrecio,
+    oferta: dibujarOferta,
+    servicio: dibujarServicio,
+    horario: dibujarHorario,
+    contacto: dibujarContacto,
+    ubicacion: dibujarUbicacion,
+    cta: dibujarCta,
     idea: dibujarIdea,
     flecha: dibujarFlecha,
     pasos: dibujarPasos,

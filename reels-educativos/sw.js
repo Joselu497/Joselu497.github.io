@@ -1,11 +1,12 @@
 /* Service worker: permite instalar la app y usarla sin internet. */
-const CACHE = 'reels-educativos-v5';
+const CACHE = 'reels-educativos-v7';
 const ARCHIVOS = [
   './',
   './index.html',
   './css/estilos.css',
   './js/dibujos.js',
   './js/motor.js',
+  './js/voz.js',
   './js/grabador.js',
   './js/app.js',
   './manifest.webmanifest',

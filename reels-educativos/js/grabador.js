@@ -48,14 +48,20 @@
     });
   }
 
+  function decodificarBytes(ac, bytes) {
+    return new Promise(function (res, rej) {
+      var copia = bytes.slice(0);
+      var p;
+      try {
+        p = ac.decodeAudioData(copia, res, function (e) { rej(e || new Error('Audio no válido')); });
+      } catch (e) { rej(e); return; }
+      if (p && typeof p.then === 'function') p.then(res).catch(rej);
+    });
+  }
+
   function decodificar(ac, file) {
     return leerArchivo(file).then(function (buffer) {
-      return new Promise(function (res, rej) {
-        try {
-          var p = ac.decodeAudioData(buffer, res, function (e) { rej(e || new Error('Audio no válido')); });
-          if (p && typeof p.then === 'function') p.then(res).catch(rej);
-        } catch (e) { rej(e); }
-      });
+      return decodificarBytes(ac, buffer);
     });
   }
 
@@ -90,6 +96,39 @@
     nodos.push(osc);
 
     var conMic = !!opciones.microfono;
+    var gMusica = null;
+
+    /* Cadena de voz "locutor": limpia graves, realza presencia y comprime. */
+    function crearCadenaVoz() {
+      var entrada = ac.createGain();
+      var hp = ac.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = 95;
+      hp.Q.value = 0.7;
+      var presencia = ac.createBiquadFilter();
+      presencia.type = 'peaking';
+      presencia.frequency.value = 3200;
+      presencia.Q.value = 0.9;
+      presencia.gain.value = 3.5;
+      var comp = ac.createDynamicsCompressor();
+      comp.threshold.value = -24;
+      comp.knee.value = 12;
+      comp.ratio.value = 3.5;
+      comp.attack.value = 0.005;
+      comp.release.value = 0.18;
+      var aire = ac.createBiquadFilter();
+      aire.type = 'highshelf';
+      aire.frequency.value = 6800;
+      aire.gain.value = 1.5;
+
+      entrada.connect(hp);
+      hp.connect(presencia);
+      presencia.connect(comp);
+      comp.connect(aire);
+      aire.connect(destino);
+      nodos.push(entrada, hp, presencia, comp, aire);
+      return entrada;
+    }
 
     if (opciones.musica) {
       try {
@@ -97,7 +136,7 @@
         var srcMusica = ac.createBufferSource();
         srcMusica.buffer = bufMusica;
         srcMusica.loop = true;
-        var gMusica = ac.createGain();
+        gMusica = ac.createGain();
         gMusica.gain.value = limitar(Number(opciones.volumen) || 0.35, 0, 1);
         srcMusica.connect(gMusica);
         gMusica.connect(destino);
@@ -113,6 +152,57 @@
       } catch (e) {
         console.warn('Música no válida:', e);
         if (opciones.alAviso) opciones.alAviso('No se pudo leer la música; el video se grabará sin ella.');
+      }
+    }
+
+    /* Voz natural ya descargada: se coloca al inicio de cada escena. */
+    var listaVoces = Array.isArray(opciones.voces) ? opciones.voces : [];
+    var huboVoz = false;
+
+    if (listaVoces.length) {
+      var entradaVoz = crearCadenaVoz();
+      var gVoz = ac.createGain();
+      gVoz.gain.value = limitar(Number(opciones.volumenVoz) || 1, 0, 1.6);
+      gVoz.connect(entradaVoz);
+      nodos.push(gVoz);
+
+      for (var vi = 0; vi < listaVoces.length; vi++) {
+        var v = listaVoces[vi];
+        if (!v || !v.trozos || !v.trozos.length) continue;
+        var inicioEscena = Number(v.inicio) || 0;
+        var tasa = limitar(Number(v.tasa) || 1, 0.7, 1.5);
+        var acum = 0;
+
+        for (var ti = 0; ti < v.trozos.length; ti++) {
+          var trozo = v.trozos[ti];
+          if (!trozo || !trozo.bytes) continue;
+          var buf;
+          try {
+            buf = await decodificarBytes(ac, trozo.bytes);
+          } catch (e) {
+            console.warn('Trozo de voz no válido:', e);
+            continue;
+          }
+          var fuente = ac.createBufferSource();
+          fuente.buffer = buf;
+          fuente.playbackRate.value = tasa;
+          fuente.connect(gVoz);
+          nodos.push(fuente);
+
+          (function (nodo, retraso) {
+            arranques.push(function (base) {
+              try { nodo.start(base + retraso); } catch (e) { /* ignorar */ }
+            });
+          })(fuente, 0.28 + inicioEscena + acum / tasa);
+
+          acum += buf.duration;
+          huboVoz = true;
+        }
+      }
+
+      /* La música baja a la mitad para que la voz se entienda. */
+      if (huboVoz && gMusica) {
+        gMusica.gain.value = limitar(Number(opciones.volumen) || 0.35, 0, 1) * 0.5;
       }
     }
 
@@ -147,15 +237,28 @@
       }
       pistasMic = mic.getTracks();
       var fuenteMic = ac.createMediaStreamSource(mic);
+      var hpMic = ac.createBiquadFilter();
+      hpMic.type = 'highpass';
+      hpMic.frequency.value = 90;
+      var compMic = ac.createDynamicsCompressor();
+      compMic.threshold.value = -22;
+      compMic.knee.value = 10;
+      compMic.ratio.value = 3;
+      compMic.attack.value = 0.004;
+      compMic.release.value = 0.2;
       var gMic = ac.createGain();
-      gMic.gain.value = 1;
-      fuenteMic.connect(gMic);
+      gMic.gain.value = 1.05;
+      fuenteMic.connect(hpMic);
+      hpMic.connect(compMic);
+      compMic.connect(gMic);
       gMic.connect(destino);
+      nodos.push(hpMic, compMic, gMic);
     }
 
     audio.iniciar = function () {
+      var base = ac.currentTime + 0.08;
       arranques.forEach(function (fn) {
-        try { fn(); } catch (e) { /* ignorar */ }
+        try { fn(base); } catch (e) { /* ignorar */ }
       });
       arranques = [];
     };
