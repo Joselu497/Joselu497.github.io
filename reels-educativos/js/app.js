@@ -587,7 +587,9 @@
       el.cuenta.classList.remove('pulso');
       void el.cuenta.offsetWidth;
       el.cuenta.classList.add('pulso');
-      el.estadoGrabacion.textContent = 'Prepárate para narrar';
+      el.estadoGrabacion.textContent = (estado.voz === 'mic' || archivos.narracion)
+        ? 'Prepárate para narrar'
+        : 'Preparando el video';
       el.capaGrabacion.classList.remove('grabando');
     } else {
       el.cuenta.textContent = '';
