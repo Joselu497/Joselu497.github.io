@@ -371,13 +371,24 @@
       var resolver = null;
       var ultimoPaso = performance.now();
       var vigilante = null;
+      var rafPendiente = false;
 
       function terminar() {
         if (!resolver) return;
         var r = resolver;
         resolver = null;
         if (vigilante) { clearInterval(vigilante); vigilante = null; }
+        rafPendiente = false;
         r();
+      }
+
+      function programar() {
+        if (rafPendiente || !resolver) return;
+        rafPendiente = true;
+        global.requestAnimationFrame(function () {
+          rafPendiente = false;
+          paso();
+        });
       }
 
       function paso() {
@@ -398,7 +409,7 @@
         if (opciones.alFrame) opciones.alFrame(tt);
         if (opciones.alProgreso) opciones.alProgreso(limitar(tt / duracion, 0, 1));
         ultimoPaso = performance.now();
-        global.requestAnimationFrame(paso);
+        programar();
       }
 
       await new Promise(function (res) {
@@ -406,7 +417,7 @@
         vigilante = setInterval(function () {
           if (performance.now() - ultimoPaso > 320) paso();
         }, 220);
-        paso();
+        programar();
       });
 
       await terminado;

@@ -709,6 +709,7 @@
       el.capaGrabacion.classList.remove('grabando');
       el.cuenta.hidden = false;
       el.cuenta.textContent = '';
+      el.estadoGrabacion.textContent = '';
       el.btnCancelar.hidden = true;
       el.btnGenerar.disabled = false;
       el.btnPlay.hidden = false;
