@@ -1,5 +1,5 @@
 /* Service worker: permite instalar la app y usarla sin internet. */
-const CACHE = 'reels-educativos-v13';
+const CACHE = 'reels-aero-v15';
 const ARCHIVOS = [
   './',
   './index.html',
@@ -46,7 +46,7 @@ self.addEventListener('install', (evento) => {
           if (!ok) fallos += 1;
         }
         if (fallos) {
-          console.warn('Reels Educativos: no se pudieron guardar ' + fallos + ' archivo(s).');
+          console.warn('Reels Aero: no se pudieron guardar ' + fallos + ' archivo(s).');
         }
         await self.skipWaiting();
       })

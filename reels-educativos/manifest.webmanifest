@@ -1,7 +1,7 @@
 {
-  "name": "Reels Educativos · formas que explican",
-  "short_name": "Reels Educa",
-  "description": "Crea videos educativos verticales con dibujos y formas animadas directamente desde tu celular.",
+  "name": "Reels Aero · anuncios que hablan",
+  "short_name": "Reels Aero",
+  "description": "Crea videos verticales animados con un señor locutor que habla, dibujos y formas, directamente desde tu celular.",
   "lang": "es",
   "dir": "ltr",
   "start_url": "./",
@@ -11,7 +11,7 @@
   "orientation": "portrait",
   "background_color": "#070b16",
   "theme_color": "#070b16",
-  "categories": ["education", "video", "productivity"],
+  "categories": ["video", "productivity", "business"],
   "icons": [
     {
       "src": "iconos/icon-192.png",

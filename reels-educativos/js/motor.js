@@ -68,7 +68,7 @@
   function autoVisual(texto, rotacion) {
     var t = texto.toLowerCase();
 
-    /* Anuncios y negocios: se detectan antes que las formas educativas. */
+    /* Anuncios y negocios: se detectan antes que las formas explicativas. */
     if (/%|\b(oferta|ofertas|descuento|rebaja|liquidaci[oó]n|promo|promoci[oó]n)\b/.test(t)) return 'oferta';
     if (/\b(2\s*[xX]\s*1|3\s*[xX]\s*2|2 por 1|3 por 2|mitad de precio)\b/.test(t)) return 'oferta';
     if (/(?:US\$|\$|€|£)\s*\d|\d[\d.,]*\s*(?:usd|eur|bs\.?|soles|pesos|mxn|ars|clp|d[oó]lares|euros)\b|\b(precio|cuesta|desde)\b/.test(t)) return 'precio';
@@ -462,7 +462,7 @@
   function nombreArchivo(texto) {
     var base = String(texto || '').replace(/#[a-záéíóúüñ]+/gi, ' ').replace(/[^\p{L}\p{N} ]/gu, ' ')
       .trim().split(/\s+/).slice(0, 5).join('-').toLowerCase();
-    if (!base) base = 'reel-educativo';
+    if (!base) base = 'reel-aero';
     if (base.length > 48) base = base.slice(0, 48);
     var d = new Date();
     var sello = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');

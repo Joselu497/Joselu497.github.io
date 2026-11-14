@@ -299,6 +299,299 @@
     throw err;
   }
 
+  /* ---------- voz clásica de locutor (meSpeak, sin internet) ---------- */
+
+  var motorClasico = null;
+  var cargandoClasico = null;
+
+  function esperarCondicion(cond, ms) {
+    return new Promise(function (res, rej) {
+      var t0 = performance.now();
+      (function mirar() {
+        if (cond()) { res(true); return; }
+        if (performance.now() - t0 > ms) { rej(new Error('tiempo agotado')); return; }
+        setTimeout(mirar, 60);
+      })();
+    });
+  }
+
+  function cargarIdioma(m, id) {
+    return new Promise(function (res, rej) {
+      if (m.isVoiceLoaded(id)) { res(true); return; }
+      var hecho = false;
+      var reloj = setTimeout(function () {
+        if (hecho) return;
+        hecho = true;
+        rej(new Error('La voz clásica tardó demasiado en cargar.'));
+      }, 25000);
+      try {
+        m.loadVoice('js/mespeak/voices/' + id + '.json', function (ok) {
+          if (hecho) return;
+          hecho = true;
+          clearTimeout(reloj);
+          if (ok) res(true);
+          else rej(new Error('No se pudo cargar la voz clásica.'));
+        });
+      } catch (e) {
+        hecho = true;
+        clearTimeout(reloj);
+        rej(e);
+      }
+    });
+  }
+
+  /* Descarga una sola vez el motor (unos 3 MB) y guarda la promesa para
+     reutilizarla en todas las frases y videos. */
+  function cargarMotorClasico() {
+    if (motorClasico) return Promise.resolve(motorClasico);
+    if (cargandoClasico) return cargandoClasico;
+
+    function arrancar() {
+      var m = global.meSpeak;
+      if (!m) throw new Error('La voz clásica no está disponible.');
+      if (!m.isConfigLoaded()) m.loadConfig('js/mespeak/mespeak_config.json');
+      return esperarCondicion(function () { return m.isConfigLoaded(); }, 25000)
+        .then(function () { return cargarIdioma(m, 'es'); })
+        .then(function () { return cargarIdioma(m, 'es-la'); })
+        .then(function () {
+          m.setDefaultVoice('es');
+          motorClasico = m;
+          return m;
+        });
+    }
+
+    cargandoClasico = new Promise(function (res, rej) {
+      if (global.meSpeak) {
+        try { res(arrancar()); } catch (e) { rej(e); }
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = 'js/mespeak/mespeak.js';
+      s.async = true;
+      s.onload = function () {
+        try { res(arrancar()); } catch (e) { rej(e); }
+      };
+      s.onerror = function () {
+        rej(new Error('No se pudo cargar la voz clásica. Revisa tu conexión.'));
+      };
+      document.head.appendChild(s);
+    }).catch(function (e) {
+      cargandoClasico = null;
+      throw e;
+    });
+
+    return cargandoClasico;
+  }
+
+  function datosWav(bytes) {
+    var v = new Uint8Array(bytes);
+    var i = 12;
+    var dv = new DataView(bytes);
+    while (i + 8 <= v.length) {
+      var id = String.fromCharCode(v[i], v[i + 1], v[i + 2], v[i + 3]);
+      var tam = dv.getUint32(i + 4, true);
+      if (id === 'data') {
+        return { inicio: i + 8, largo: Math.min(tam || 0, v.length - i - 8) };
+      }
+      i += 8 + tam + (tam % 2);
+    }
+    return { inicio: 44, largo: Math.max(0, v.length - 44) };
+  }
+
+  /* ---------- carácter y pulido de la voz clásica ---------- */
+
+  /* Perfil por defecto: el señor, voz masculina cálida. */
+  var PERFIL_VOZ = { pitch: 40, speed: 162 };
+
+  function perfilDe(opciones) {
+    var p = (opciones && opciones.perfil) || {};
+    var pitch = Number(p.pitch);
+    var speed = Number(p.speed);
+    return {
+      pitch: Math.round(limitar(isFinite(pitch) && pitch > 0 ? pitch : PERFIL_VOZ.pitch, 20, 80)),
+      speed: Math.round(limitar(isFinite(speed) && speed > 0 ? speed : PERFIL_VOZ.speed, 135, 190))
+    };
+  }
+
+  function wavDeBuffer(buffer) {
+    var datos = buffer.getChannelData(0);
+    var n = datos.length;
+    var out = new Uint8Array(44 + n * 2);
+    var dv = new DataView(out.buffer);
+    function texto(off, s) {
+      for (var i = 0; i < 4; i++) out[off + i] = s.charCodeAt(i);
+    }
+    texto(0, 'RIFF');
+    dv.setUint32(4, 36 + n * 2, true);
+    texto(8, 'WAVE');
+    texto(12, 'fmt ');
+    dv.setUint32(16, 16, true);
+    dv.setUint16(20, 1, true);
+    dv.setUint16(22, 1, true);
+    dv.setUint32(24, buffer.sampleRate, true);
+    dv.setUint32(28, buffer.sampleRate * 2, true);
+    dv.setUint16(32, 2, true);
+    dv.setUint16(34, 16, true);
+    texto(36, 'data');
+    dv.setUint32(40, n * 2, true);
+    var pico = 0;
+    for (var k = 0; k < n; k++) {
+      var v = datos[k];
+      if (v > pico) pico = v;
+      else if (-v > pico) pico = -v;
+    }
+    var g = pico > 0.0001 ? 0.86 / pico : 1;
+    for (var j = 0; j < n; j++) {
+      var m = datos[j] * g;
+      m = m < -1 ? -1 : (m > 1 ? 1 : m);
+      dv.setInt16(44 + j * 2, m < 0 ? m * 0x8000 : m * 0x7fff, true);
+    }
+    return out.buffer;
+  }
+
+  /* Cadena de locutor: más cuerpo, menos dureza y volumen parejo. Se aplica
+     antes de guardar el audio, así suena igual al probar y en el video. */
+  async function pulirVoz(bytes) {
+    var buffer = await decodificar(bytes);
+    var OAC = global.OfflineAudioContext || global.webkitOfflineAudioContext;
+    if (!OAC || !buffer.length || !buffer.sampleRate) {
+      return { bytes: bytes, duracion: buffer.duration };
+    }
+    var off = new OAC(1, buffer.length, buffer.sampleRate);
+    var origen = off.createBufferSource();
+    origen.buffer = buffer;
+
+    var hp = off.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 88;
+    hp.Q.value = 0.7;
+
+    var cuerpo = off.createBiquadFilter();
+    cuerpo.type = 'peaking';
+    cuerpo.frequency.value = 215;
+    cuerpo.Q.value = 1.1;
+    cuerpo.gain.value = 3.4;
+
+    var dureza = off.createBiquadFilter();
+    dureza.type = 'peaking';
+    dureza.frequency.value = 3300;
+    dureza.Q.value = 1.3;
+    dureza.gain.value = -2.4;
+
+    var aire = off.createBiquadFilter();
+    aire.type = 'highshelf';
+    aire.frequency.value = 6000;
+    aire.gain.value = -3.5;
+
+    var tope = off.createBiquadFilter();
+    tope.type = 'lowpass';
+    tope.frequency.value = 8800;
+    tope.Q.value = 0.4;
+
+    var comp = off.createDynamicsCompressor();
+    comp.threshold.value = -20;
+    comp.knee.value = 12;
+    comp.ratio.value = 3.2;
+    comp.attack.value = 0.006;
+    comp.release.value = 0.16;
+
+    origen.connect(hp);
+    hp.connect(cuerpo);
+    cuerpo.connect(dureza);
+    dureza.connect(aire);
+    aire.connect(tope);
+    tope.connect(comp);
+    comp.connect(off.destination);
+    origen.start();
+
+    var listo = await off.startRendering();
+    return { bytes: wavDeBuffer(listo), duracion: listo.duration };
+  }
+
+  /* Une varios WAV en uno solo para poder escuchar la prueba completa. */
+  function unirWav(partes) {
+    if (partes.length === 1) return partes[0];
+    var base = new DataView(partes[0]);
+    var rate = base.getUint32(24, true);
+    var canales = base.getUint16(22, true);
+    var bits = base.getUint16(34, true);
+    var trozos = partes.map(function (b) {
+      var d = datosWav(b);
+      return new Uint8Array(b, d.inicio, d.largo);
+    });
+    var total = trozos.reduce(function (n, t) { return n + t.length; }, 0);
+    var out = new Uint8Array(44 + total);
+    var dv = new DataView(out.buffer);
+    function texto(off, s) {
+      for (var i = 0; i < 4; i++) out[off + i] = s.charCodeAt(i);
+    }
+    texto(0, 'RIFF');
+    dv.setUint32(4, 36 + total, true);
+    texto(8, 'WAVE');
+    texto(12, 'fmt ');
+    dv.setUint32(16, 16, true);
+    dv.setUint16(20, 1, true);
+    dv.setUint16(22, canales, true);
+    dv.setUint32(24, rate, true);
+    dv.setUint32(28, rate * canales * bits / 8, true);
+    dv.setUint16(32, canales * bits / 8, true);
+    dv.setUint16(34, bits, true);
+    texto(36, 'data');
+    dv.setUint32(40, total, true);
+    var off = 44;
+    trozos.forEach(function (t) {
+      out.set(t, off);
+      off += t.length;
+    });
+    return out.buffer;
+  }
+
+  async function sintetizarLocal(texto, opciones) {
+    var trozos = trocear(texto);
+    if (!trozos.length) return { trozos: [], duracion: 0 };
+
+    var m = await cargarMotorClasico();
+    var voz = opciones.idioma === 'es-mx' ? 'es-la' : 'es';
+    var perfil = perfilDe(opciones);
+    var salida = [];
+    var total = 0;
+
+    for (var i = 0; i < trozos.length; i++) {
+      if (opciones.senal && opciones.senal.cancelado) throw cancelado();
+      var crudo = m.speak(trozos[i], {
+        voice: voz,
+        rawdata: 'arraybuffer',
+        amplitude: 100,
+        pitch: perfil.pitch,
+        speed: perfil.speed,
+        wordgap: 0
+      });
+      if (!crudo || !crudo.byteLength) throw new Error('La voz clásica no devolvió audio.');
+
+      var bytes = crudo;
+      var duracion = 0;
+      try {
+        var pulido = await pulirVoz(crudo);
+        if (pulido) {
+          bytes = pulido.bytes;
+          duracion = pulido.duracion;
+        }
+      } catch (e) {
+        console.warn('No se pudo pulir la voz clásica:', e);
+      }
+      if (!duracion) {
+        var buffer = await decodificar(bytes);
+        duracion = buffer.duration;
+      }
+
+      salida.push({ bytes: bytes, duracion: duracion });
+      total += duracion;
+      /* Deja respirar a la interfaz entre frase y frase. */
+      await esperar(0);
+    }
+    return { trozos: salida, duracion: total };
+  }
+
   /* ---------- audio ---------- */
 
   function decodificar(bytes) {
@@ -318,6 +611,7 @@
 
   async function sintetizar(texto, opciones) {
     opciones = opciones || {};
+    if (opciones.motor === 'loquendo') return sintetizarLocal(texto, opciones);
     var idioma = opciones.idioma === 'es-mx' ? 'es-mx' : 'es';
     var trozos = trocear(texto);
     if (!trozos.length) return { trozos: [], duracion: 0 };
@@ -378,7 +672,12 @@
         if (senal.cancelado) { error = cancelado(); return; }
         if (opciones.alEstado) opciones.alEstado('Generando voz ' + (hechos + 1) + ' de ' + total + '…');
         try {
-          var r = await sintetizar(escenas[i].texto, { idioma: opciones.idioma, senal: senal });
+          var r = await sintetizar(escenas[i].texto, {
+            idioma: opciones.idioma,
+            senal: senal,
+            motor: opciones.motor,
+            perfil: opciones.perfil
+          });
           if (!r.trozos.length) {
             voces[i] = { trozos: [], tasa: tasa };
             duraciones[i] = 2.2;
@@ -415,9 +714,13 @@
   }
 
   async function probar(texto, opciones) {
-    var r = await sintetizar(texto, opciones || {});
+    opciones = opciones || {};
+    var r = await sintetizar(texto, opciones);
     var partes = r.trozos.map(function (t) { return t.bytes; });
     if (!partes.length) throw new Error('No hay texto para escuchar.');
+    if (opciones.motor === 'loquendo') {
+      return new Blob([unirWav(partes)], { type: 'audio/wav' });
+    }
     return new Blob(partes, { type: 'audio/mpeg' });
   }
 

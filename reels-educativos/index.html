@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b1020">
-  <meta name="description" content="Crea videos educativos verticales con dibujos y formas animadas directamente desde tu celular.">
+  <meta name="description" content="Crea videos verticales animados con un señor locutor que habla, dibujos y formas, directamente desde tu celular.">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Reels Educa">
-  <title>Reels Educativos · formas que explican</title>
+  <meta name="apple-mobile-web-app-title" content="Reels Aero">
+  <title>Reels Aero · anuncios que hablan</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="iconos/icon-192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
@@ -21,8 +21,8 @@
       <div class="marca">
         <span class="marca-logo" aria-hidden="true"></span>
         <div class="marca-texto">
-          <strong>Reels Educativos</strong>
-          <small>formas que explican</small>
+          <strong>Reels Aero</strong>
+          <small>anuncios que hablan</small>
         </div>
       </div>
       <div class="cabecera-acciones">
@@ -60,7 +60,7 @@
           </div>
           <p class="ayuda">Una idea por línea. Las líneas vacías se ignoran.</p>
           <div class="tematicas" id="tematicas" aria-label="Temáticas"></div>
-          <textarea id="guion" rows="7" spellcheck="true" placeholder="#idea La fotosíntesis&#10;Las plantas fabrican su alimento&#10;#pasos Toman agua y CO2&#10;#check Por eso limpian el aire"></textarea>
+          <textarea id="guion" rows="7" spellcheck="true" placeholder="#personaje ¡Muy buenas! Soy don Ramón&#10;#servicio Reparamos celulares | Tablets&#10;#precio Desde $25&#10;#oferta 20% de descuento&#10;#cta ¡Escríbenos hoy!"></textarea>
           <div class="chips" id="chips-visuales" aria-label="Añadir una forma"></div>
           <p class="contador" id="contador">0 escenas · 0:00</p>
         </div>
@@ -99,7 +99,7 @@
             <select id="personaje"></select>
           </label>
           <label class="campo">Marca de agua
-            <input id="marca" maxlength="30" placeholder="@tuclase" autocomplete="off">
+            <input id="marca" maxlength="30" placeholder="@tunegocio" autocomplete="off">
           </label>
           <label class="interruptor">
             <input type="checkbox" id="progreso" checked>
@@ -121,14 +121,16 @@
           </label>
           <label class="campo">Voz
             <select id="voz">
-              <option value="ninguna">Sin voz (solo música)</option>
+              <option value="loquendo">Voz clásica de locutor · español</option>
+              <option value="loquendo-mx">Voz clásica de locutor · latino</option>
               <option value="natural">Voz natural · español</option>
               <option value="natural-mx">Voz natural · latino</option>
+              <option value="ninguna">Sin voz (solo música)</option>
               <option value="mic">Mi voz con el micrófono</option>
             </select>
           </label>
           <button class="boton-secundario compacto" id="btn-probar-voz" type="button">Escuchar prueba de voz</button>
-          <p class="nota" id="nota-voz">La voz natural se descarga una vez por frase y luego queda guardada en tu teléfono. Necesita internet al generar el video.</p>
+          <p class="nota" id="nota-voz">La voz clásica de locutor viene incluida en la app: funciona sin internet, sin cuentas y sin límite.</p>
           <p class="nota">Sin audio el video se genera igual, en silencio. Si eliges micrófono, narra mientras corre la animación.</p>
         </details>
 
@@ -167,12 +169,12 @@
       <p><strong>1.</strong> Escribe una idea por línea o elige una <strong>temática</strong> para empezar con un guion de ejemplo. Cada línea se convierte en una escena con una forma animada.</p>
       <p><strong>2.</strong> Elige la forma al inicio de la línea:</p>
       <ul class="lista-visuales" id="lista-visuales"></ul>
-      <p><strong>3.</strong> En <strong>Formato y estilo</strong> elige un <strong>personaje</strong>: aparecerá como mascota animada en cada escena. Con <code>#personaje</code> el personaje sale grande y dice tu texto en un globo. La paleta <strong>Frutiger Aero</strong> añade cielo, agua, cristal y burbujas brillantes.</p>
-      <p><strong>4.</strong> En <strong>Audio</strong> puedes poner música, una narración grabada o una <strong>voz natural</strong> que lee tu guion con acento español o latino. La voz se descarga una vez por frase y queda guardada en el teléfono.</p>
+      <p><strong>3.</strong> En <strong>Formato y estilo</strong> elige un <strong>personaje</strong>: el <strong>Señor</strong> es el locutor que aparece en cada escena y mueve la boca mientras habla. Con <code>#personaje</code> sale grande y dice tu texto en un globo. La paleta <strong>Frutiger Aero</strong> añade cielo, agua, cristal y burbujas brillantes.</p>
+      <p><strong>4.</strong> En <strong>Audio</strong> elige la <strong>voz clásica de locutor</strong> (estilo Loquendo): viene incluida, funciona sin internet y no tiene límite. También puedes poner música, una narración grabada o tu propia voz.</p>
       <p><strong>5.</strong> Pulsa <strong>Generar video</strong>. La animación se reproduce en tiempo real y se graba dentro de tu teléfono.</p>
       <p><strong>6.</strong> Al terminar puedes <strong>compartir</strong> el video con TikTok, Instagram o WhatsApp, o descargarlo.</p>
       <p class="nota"><strong>En iPhone:</strong> para instalarla, toca <em>Compartir</em> en Safari y elige <em>Añadir a pantalla de inicio</em>.</p>
-      <p class="nota">El video se genera en tu dispositivo y no hay límite de videos. La voz natural sí usa internet para descargar el audio la primera vez.</p>
+      <p class="nota">El video se genera en tu dispositivo y no hay límite de videos. La voz clásica funciona sin internet; la voz natural sí lo necesita la primera vez.</p>
       <p class="nota">Para música, usa archivos libres de derechos. El micrófono necesita permiso del navegador.</p>
     </div>
     <button class="boton-secundario ancho" id="btn-cerrar-ayuda-2">Entendido</button>

@@ -98,28 +98,30 @@
     var conMic = !!opciones.microfono;
     var gMusica = null;
 
-    /* Cadena de voz "locutor": limpia graves, realza presencia y comprime. */
-    function crearCadenaVoz() {
+    /* Cadena de voz "locutor": limpia graves, realza presencia y comprime.
+       La voz clásica ya viene pulida desde Voz, así que aquí solo se
+       nivela un poco el volumen. */
+    function crearCadenaVoz(clasica) {
       var entrada = ac.createGain();
       var hp = ac.createBiquadFilter();
       hp.type = 'highpass';
-      hp.frequency.value = 95;
+      hp.frequency.value = clasica ? 85 : 95;
       hp.Q.value = 0.7;
       var presencia = ac.createBiquadFilter();
       presencia.type = 'peaking';
       presencia.frequency.value = 3200;
       presencia.Q.value = 0.9;
-      presencia.gain.value = 3.5;
+      presencia.gain.value = clasica ? 0.5 : 3.5;
       var comp = ac.createDynamicsCompressor();
-      comp.threshold.value = -24;
+      comp.threshold.value = clasica ? -12 : -24;
       comp.knee.value = 12;
-      comp.ratio.value = 3.5;
+      comp.ratio.value = clasica ? 2.2 : 3.5;
       comp.attack.value = 0.005;
       comp.release.value = 0.18;
       var aire = ac.createBiquadFilter();
       aire.type = 'highshelf';
       aire.frequency.value = 6800;
-      aire.gain.value = 1.5;
+      aire.gain.value = clasica ? -0.5 : 1.5;
 
       entrada.connect(hp);
       hp.connect(presencia);
@@ -155,12 +157,13 @@
       }
     }
 
-    /* Voz natural ya descargada: se coloca al inicio de cada escena. */
+    /* Voz natural ya descargada (o voz clásica local): se coloca al inicio
+       de cada escena. */
     var listaVoces = Array.isArray(opciones.voces) ? opciones.voces : [];
     var huboVoz = false;
 
     if (listaVoces.length) {
-      var entradaVoz = crearCadenaVoz();
+      var entradaVoz = crearCadenaVoz(Boolean(opciones.vozClasica));
       var gVoz = ac.createGain();
       gVoz.gain.value = limitar(Number(opciones.volumenVoz) || 1, 0, 1.6);
       gVoz.connect(entradaVoz);

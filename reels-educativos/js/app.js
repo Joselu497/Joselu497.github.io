@@ -3,7 +3,7 @@
   'use strict';
 
   var $ = function (id) { return document.getElementById(id); };
-  var CLAVE = 'reels-educativos-v1';
+  var CLAVE = 'reels-senor-v1';
 
   var el = {
     marco: $('marco'),
@@ -62,14 +62,14 @@
     guion: '',
     formato: '9:16',
     calidad: '720',
-    paleta: 'pizarra',
-    personaje: 'buho',
+    paleta: 'aero',
+    personaje: 'senor',
     ritmo: 1,
     marca: '',
     progreso: true,
     volumen: 0.35,
-    voz: 'ninguna',
-    tematica: 'educativo'
+    voz: 'loquendo',
+    tematica: 'anuncio'
   };
 
   var archivos = { musica: null, narracion: null };
@@ -86,34 +86,34 @@
   var avisoTimer = null;
 
   var EJEMPLO = [
-    '#personaje ¡Hola! Hoy veremos la fotosíntesis',
-    '#idea La fotosíntesis',
-    '#flecha Las plantas usan luz, agua y CO2',
-    '#pasos Absorben agua | Capturan la luz | Liberan oxígeno',
-    '#grafico Así crece su energía',
-    '#numero 6 CO2 + 6 H2O',
-    '#formula 6CO2 + 6H2O = C6H12O6 + 6O2',
-    '#check Por eso limpian el aire',
-    '#personaje ¡Tú puedes! Cuida las plantas'
+    '#personaje ¡Muy buenas! Soy don Ramón',
+    '#servicio Reparamos celulares | Tablets | Computadoras',
+    '#check Diagnóstico gratis en el acto',
+    '#precio Desde $25 con garantía',
+    '#oferta 20% de descuento esta semana',
+    '#horario De lunes a sábado, de 9 a 19',
+    '#ubicacion Av. Central 123, frente al parque',
+    '#contacto WhatsApp 555 123 4567',
+    '#cta ¡Escríbenos y te atendemos hoy!'
   ].join('\n');
 
   var TEMATICAS = [
     {
-      id: 'educativo',
-      nombre: 'Educativo',
-      paleta: 'pizarra',
-      personaje: 'buho',
-      ritmo: 1,
-      voz: 'ninguna',
-      guion: EJEMPLO
-    },
-    {
       id: 'anuncio',
       nombre: 'Anuncio',
       paleta: 'aero',
-      personaje: 'nube',
+      personaje: 'senor',
       ritmo: 1,
-      voz: 'natural',
+      voz: 'loquendo',
+      guion: EJEMPLO
+    },
+    {
+      id: 'servicios',
+      nombre: 'Servicios',
+      paleta: 'aero',
+      personaje: 'senor',
+      ritmo: 1,
+      voz: 'loquendo',
       guion: [
         '#personaje ¡Tu negocio merece brillar!',
         '#servicio Diseño | Instalación | Mantenimiento',
@@ -129,9 +129,9 @@
       id: 'omnibus',
       nombre: 'Agencia de buses',
       paleta: 'aero',
-      personaje: 'buho',
+      personaje: 'senor',
       ritmo: 1.05,
-      voz: 'natural',
+      voz: 'loquendo',
       guion: [
         '#personaje ¡Viaja cómodo y seguro!',
         '#servicio Salidas diarias | Asientos reclinables | Wi-Fi a bordo',
@@ -147,9 +147,9 @@
       id: 'tienda',
       nombre: 'Tienda de decoración',
       paleta: 'aero',
-      personaje: 'planta',
+      personaje: 'senor',
       ritmo: 0.95,
-      voz: 'natural',
+      voz: 'loquendo',
       guion: [
         '#personaje ¡Dale vida a tu hogar!',
         '#servicio Lámparas | Cojines | Cuadros | Plantas',
@@ -165,9 +165,9 @@
       id: 'oferta',
       nombre: 'Oferta relámpago',
       paleta: 'neon',
-      personaje: 'gato',
+      personaje: 'senor',
       ritmo: 1.1,
-      voz: 'natural',
+      voz: 'loquendo',
       guion: [
         '#personaje ¡Solo por hoy!',
         '#oferta 50% de descuento',
@@ -181,9 +181,9 @@
       id: 'evento',
       nombre: 'Evento',
       paleta: 'papel',
-      personaje: 'gato',
+      personaje: 'senor',
       ritmo: 1,
-      voz: 'natural',
+      voz: 'loquendo',
       guion: [
         '#personaje ¡Te esperamos!',
         '#idea Feria de emprendedores',
@@ -225,20 +225,20 @@
   function recuperar() {
     try {
       var crudo = localStorage.getItem(CLAVE);
-      if (!crudo) return;
+      if (!crudo) return false;
       var datos = JSON.parse(crudo);
-      if (!datos || typeof datos !== 'object') return;
+      if (!datos || typeof datos !== 'object') return false;
       ['guion', 'formato', 'calidad', 'paleta', 'personaje', 'marca'].forEach(function (k) {
         if (typeof datos[k] === 'string') estado[k] = datos[k];
       });
       var personajes = (window.Dibujos && window.Dibujos.PERSONAJES) || [];
       if (!personajes.some(function (p) { return p.id === estado.personaje; })) {
-        estado.personaje = 'buho';
+        estado.personaje = 'senor';
       }
       if (Number(datos.ritmo)) estado.ritmo = Number(datos.ritmo);
       if (Number(datos.volumen) >= 0) estado.volumen = Number(datos.volumen);
       if (typeof datos.progreso === 'boolean') estado.progreso = datos.progreso;
-      var vocesValidas = ['ninguna', 'natural', 'natural-mx', 'mic'];
+      var vocesValidas = ['ninguna', 'loquendo', 'loquendo-mx', 'natural', 'natural-mx', 'mic'];
       if (typeof datos.voz === 'string' && vocesValidas.indexOf(datos.voz) >= 0) {
         estado.voz = datos.voz;
       } else if (datos.microfono === true) {
@@ -247,7 +247,9 @@
       if (typeof datos.tematica === 'string' && TEMATICAS.some(function (t) { return t.id === datos.tematica; })) {
         estado.tematica = datos.tematica;
       }
+      return true;
     } catch (e) { /* ignorar */ }
+    return false;
   }
 
   function tamanoPeso(bytes) {
@@ -374,15 +376,31 @@
   }
 
   function idiomaVoz() {
-    return estado.voz === 'natural-mx' ? 'es-mx' : 'es';
+    return estado.voz === 'natural-mx' || estado.voz === 'loquendo-mx' ? 'es-mx' : 'es';
+  }
+
+  function esVozClasica() {
+    return estado.voz === 'loquendo' || estado.voz === 'loquendo-mx';
+  }
+
+  /* Cada mascota tiene su propio tono de voz clásica. */
+  function perfilVoz() {
+    var lista = (window.Dibujos && window.Dibujos.PERSONAJES) || [];
+    for (var i = 0; i < lista.length; i++) {
+      if (lista[i].id === estado.personaje && lista[i].voz) return lista[i].voz;
+    }
+    return null;
   }
 
   function actualizarVozUI() {
     if (!el.voz) return;
     var natural = estado.voz === 'natural' || estado.voz === 'natural-mx';
-    if (el.btnProbarVoz) el.btnProbarVoz.hidden = !natural;
+    var clasica = esVozClasica();
+    if (el.btnProbarVoz) el.btnProbarVoz.hidden = !(natural || clasica);
     if (!el.notaVoz) return;
-    if (natural) {
+    if (clasica) {
+      el.notaVoz.textContent = 'Voz de locutor incluida en la app: funciona sin internet, sin cuentas y sin límite. Cada mascota habla con su propio tono.';
+    } else if (natural) {
       el.notaVoz.textContent = 'Voz de Google, gratis. Se descarga una vez por frase y queda guardada en tu teléfono. Necesita internet al generar.';
     } else if (estado.voz === 'mic') {
       el.notaVoz.textContent = 'Narra mientras corre la animación. El navegador pedirá permiso para el micrófono al generar.';
@@ -434,16 +452,22 @@
 
   function probarVoz() {
     if (!window.Voz) {
-      avisar('La voz natural no está disponible en este navegador.');
+      avisar('La voz no está disponible en este navegador.');
       return;
     }
+    var clasica = esVozClasica();
     var texto = (videoEstado && videoEstado.escenas[0] && videoEstado.escenas[0].texto) ||
-      'Hola, esta es una prueba de voz natural para tus videos.';
+      (clasica ? 'Muy buenas, amigos. Así suena la voz de tus videos.'
+               : 'Hola, esta es una prueba de voz natural para tus videos.');
     el.btnProbarVoz.disabled = true;
     var original = el.btnProbarVoz.textContent;
-    el.btnProbarVoz.textContent = 'Descargando voz…';
+    el.btnProbarVoz.textContent = clasica ? 'Preparando voz…' : 'Descargando voz…';
 
-    Voz.probar(texto, { idioma: idiomaVoz() }).then(function (blob) {
+    Voz.probar(texto, {
+      idioma: idiomaVoz(),
+      motor: clasica ? 'loquendo' : 'natural',
+      perfil: clasica ? perfilVoz() : null
+    }).then(function (blob) {
       var url = URL.createObjectURL(blob);
       var audio = new Audio(url);
       audio.onended = function () {
@@ -455,7 +479,9 @@
       return audio.play();
     }).catch(function (e) {
       console.warn('Prueba de voz:', e);
-      avisar('No se pudo descargar la voz. Revisa tu conexión e inténtalo otra vez.', 6200);
+      avisar(clasica
+        ? 'No se pudo preparar la voz clásica. Inténtalo otra vez.'
+        : 'No se pudo descargar la voz. Revisa tu conexión e inténtalo otra vez.', 6200);
     }).then(function () {
       el.btnProbarVoz.disabled = false;
       el.btnProbarVoz.textContent = original;
@@ -553,7 +579,7 @@
     } catch (e) { puede = false; }
     if (puede) {
       try {
-        await navigator.share({ files: [file], title: 'Mi reel educativo' });
+        await navigator.share({ files: [file], title: 'Mi reel' });
         return;
       } catch (e) {
         if (e && e.name === 'AbortError') return;
@@ -633,20 +659,27 @@
     el.btnPlay.hidden = true;
 
     try {
+      var vozClasica = esVozClasica();
       var vozNatural = estado.voz === 'natural' || estado.voz === 'natural-mx';
       var vozData = null;
 
-      if (vozNatural) {
+      if (vozClasica || vozNatural) {
         if (!window.Voz) {
-          avisar('La voz natural no está disponible; el video se grabará sin voz.', 6000);
+          avisar(vozClasica
+            ? 'La voz clásica no está disponible; el video se grabará sin voz.'
+            : 'La voz natural no está disponible; el video se grabará sin voz.', 6000);
         } else {
-          el.estadoGrabacion.textContent = 'Descargando la voz natural…';
+          el.estadoGrabacion.textContent = vozClasica
+            ? 'Preparando la voz clásica…'
+            : 'Descargando la voz natural…';
           try {
             vozData = await Voz.paraEscenas(videoEstado.escenas, {
+              motor: vozClasica ? 'loquendo' : 'natural',
               idioma: idiomaVoz(),
               velocidad: estado.ritmo,
+              perfil: vozClasica ? perfilVoz() : null,
               senal: senal,
-              limiteMs: 40000,
+              limiteMs: vozClasica ? 120000 : 40000,
               alEstado: function (txt) { el.estadoGrabacion.textContent = txt; },
               alProgreso: function (f) { el.barraGrabacion.style.width = (f * 100).toFixed(1) + '%'; }
             });
@@ -658,9 +691,11 @@
             el.barraGrabacion.style.width = '0%';
           } catch (e) {
             if (senal.cancelado) throw e;
-            console.warn('Voz natural:', e);
+            console.warn('Voz:', e);
             vozData = null;
-            avisar('La voz natural no se pudo descargar a tiempo. El video se grabará sin voz; puedes intentarlo otra vez.', 6500);
+            avisar(vozClasica
+              ? 'No se pudo preparar la voz clásica. El video se grabará sin voz; puedes intentarlo otra vez.'
+              : 'La voz natural no se pudo descargar a tiempo. El video se grabará sin voz; puedes intentarlo otra vez.', 6500);
           }
         }
       }
@@ -683,6 +718,7 @@
         narracion: archivos.narracion,
         microfono: estado.voz === 'mic',
         voces: voces,
+        vozClasica: vozClasica,
         volumen: estado.volumen,
         senal: senal,
         alCuenta: alCuenta,
@@ -851,6 +887,8 @@
         actualizarVozUI();
         if (estado.voz === 'mic') {
           avisar('El micrófono se pedirá al generar. Narra durante la animación.');
+        } else if (esVozClasica()) {
+          avisar('Voz clásica activada: funciona sin internet.', 4200);
         } else if (estado.voz.indexOf('natural') === 0) {
           avisar('Voz natural activada. Se descargará al generar el video.', 4200);
         }
@@ -931,7 +969,8 @@
 
   function iniciar() {
     crearOpcionesPersonaje();
-    recuperar();
+    var habiaGuardado = recuperar();
+    if (!habiaGuardado) estado.guion = EJEMPLO;
     aplicarControles();
     crearChips();
     crearTematicas();

@@ -1,49 +1,40 @@
-# Reels Educativos · formas que explican
+# Reels Aero · anuncios que hablan
 
-App web instalable para crear **videos verticales educativos** con dibujos y formas animadas, directamente desde el celular. No necesita PC, no necesita cuenta y **no sube nada a internet**.
+App web instalable para crear **videos verticales de anuncios** con dibujos animados, un señor (o una mascota) que habla y voz de locutor incluida. Funciona desde el celular, **sin cuenta, sin pagar y sin internet**.
 
 ---
 
 ## 1. Cómo abrirla
 
-### Ya está publicada (lo más rápido)
+### Ya está publicada
 
 **Enlace:** https://joselu497.github.io/reels-educativos/
 
-Abre ese enlace en el móvil o escanea `qr-reels.png`. Está alojada gratis en GitHub Pages, así que el enlace es fijo y no depende de ningún PC encendido.
+Ábrelo en el móvil o escanea `qr-reels.png`. Está alojada gratis en GitHub Pages, así que el enlace es fijo.
 
-### Opción A · Instalarla como app (recomendada)
-
-La app necesita abrirse desde una dirección `https://` para poder instalarse, usar el micrófono y funcionar sin internet. Si algún día quieres publicarla en otro sitio, esta carpeta funciona tal cual en:
-
-- **GitHub Pages** — sube la carpeta a un repositorio y activa Pages en *Settings → Pages*.
-- **Netlify** — arrastra la carpeta en `app.netlify.com`.
-- **Cloudflare Pages** — crea un proyecto y sube la carpeta.
-- **Vercel** — importa el repositorio o arrastra la carpeta.
-
-Luego, en el celular:
+### Instalarla como app
 
 1. Abre el enlace en **Chrome (Android)** o **Safari (iPhone)**.
-2. Toca el botón **Instalar** (o el menú → *Añadir a pantalla de inicio*).
-3. La app queda como un icono más y funciona **sin internet**.
+2. Toca **Instalar** (o el menú → *Añadir a pantalla de inicio*).
+3. Queda como un icono más y funciona **sin internet**.
 
-### Opción B · Probarla en la PC
+### Probarla en la PC
 
 ```bash
 cd reels-movil
 python -m http.server 8899
 ```
 
-Abre `http://localhost:8899` en Chrome. El micrófono funciona en `localhost`, pero la instalación como app requiere `https://`.
+Abre `http://localhost:8899`. El micrófono funciona en `localhost`, pero instalar la app requiere `https://`.
 
-### Opción C · Un solo archivo
+### Un solo archivo
 
 ```bash
 cd reels-movil
 python herramientas/empaquetar.py
 ```
 
-Genera `reel-educativo.html`, que puedes abrir directamente o enviar por WhatsApp. Sirve para probar y grabar, pero **sin instalación ni service worker**; para el micrófono conviene abrirlo desde `https://` o `localhost`. La voz natural necesita internet y, abierto como archivo local, el navegador puede bloquear la descarga de audio: para anuncios con voz usa la versión publicada.
+Genera `reel-aero.html`, que puedes abrir o enviar por WhatsApp. **Sin service worker** y **sin voz clásica**: el motor de voz necesita cargar sus archivos aparte, así que para anuncios con voz usa la versión publicada.
 
 ---
 
@@ -51,92 +42,96 @@ Genera `reel-educativo.html`, que puedes abrir directamente o enviar por WhatsAp
 
 1. Elige una **temática** para empezar con guion, paleta, personaje y voz ya configurados.
 2. Escribe **una idea por línea** en el cuadro de guion.
-3. Opcional: empieza la línea con una forma (`#idea`, `#pasos`, `#precio`…).
-4. Elige **formato** (9:16, 1:1, 16:9), **calidad**, **paleta**, **personaje** y **ritmo**.
+3. Opcional: empieza la línea con una forma (`#personaje`, `#oferta`, `#precio`…).
+4. Elige **formato**, **calidad**, **paleta**, **personaje** y **ritmo**.
 5. Pulsa **Generar video**.
-6. Cuenta regresiva de 3 segundos → la animación corre en tiempo real y se graba.
+6. Cuenta regresiva de 3 segundos → la animación corre y se graba, con el personaje hablando.
 7. Al terminar: **Compartir** (TikTok, Instagram, WhatsApp…) o **Descargar**.
 
-> Duración del video = duración de la animación. Si tienes 7 escenas, el video durará aproximadamente 20–25 segundos (según el ritmo). Con voz natural, cada escena dura lo que dura su audio.
+> La duración del video es la de la animación. Con voz clásica, cada escena dura lo que dura su audio más un margen.
 
 ### Temáticas listas
 
 Los botones sobre el guion cambian todo de una vez. Si ya escribiste algo, la app pide confirmación antes de reemplazarlo.
 
-| Temática | Para qué sirve | Paleta | Voz |
-|---|---|---|---|
-| **Educativo** | Clases y explicaciones cortas | Pizarra azul | Sin voz |
-| **Anuncio** | Promocionar un negocio o servicio | Frutiger Aero | Natural |
-| **Agencia de buses** | Rutas, horarios, pasajes y reservas | Frutiger Aero | Natural |
-| **Tienda de decoración** | Productos, precios y dirección | Frutiger Aero | Natural |
-| **Oferta relámpago** | Descuentos y ventas por tiempo limitado | Neón | Natural |
-| **Evento** | Fechas, lugar e invitación | Papel y tinta | Natural |
-
-Puedes cambiar cualquier ajuste después de aplicar la temática; el guion es solo un punto de partida.
+| Temática | Para qué sirve | Paleta |
+|---|---|---|
+| **Anuncio** | Promocionar un negocio o servicio | Frutiger Aero |
+| **Servicios** | Lista de lo que ofreces | Frutiger Aero |
+| **Agencia de buses** | Rutas, horarios, pasajes y reservas | Frutiger Aero |
+| **Tienda de decoración** | Productos, precios y dirección | Frutiger Aero |
+| **Oferta relámpago** | Descuentos y ventas por tiempo limitado | Neón |
+| **Evento** | Fechas, lugar e invitación | Papel y tinta |
 
 ### Formas disponibles
 
 | Prefijo | Dibujo | Úsalo para |
 |---|---|---|
 | `#personaje` | Personaje grande con globo de diálogo | Saludar, explicar o cerrar hablando |
-| `#idea` | Bombilla que se enciende | Presentar un concepto |
+| `#idea` | Bombilla que se enciende | Presentar una idea |
 | `#flecha` | Flecha que conecta | Causa → consecuencia |
 | `#pasos` | Tres pasos en línea | Procesos (`|` separa los pasos) |
-| `#ciclo` | Círculo con flecha | Ciclos que se repiten |
+| `#ciclo` | Círculo con flecha | Cosas que se repiten |
 | `#comparar` | Dos círculos que se cruzan | “A vs B” |
 | `#grafico` | Barras que crecen | Datos y magnitudes |
 | `#numero` | Número grande en un aro | Cifras importantes |
-| `#check` | Marca de verificación | Conclusión o cierre |
-| `#formula` | Ecuación por bloques | Matemáticas, química |
-| `#circulo` | Círculos concéntricos | Ideas que giran alrededor de otra |
+| `#check` | Marca de verificación | Ventajas o cierre |
+| `#formula` | Ecuación por bloques | Precios compuestos, cálculos |
+| `#circulo` | Círculos concéntricos | Ideas alrededor de una |
 | `#subrayado` | Texto resaltado | Frases clave |
 | `#precio` | Cartel grande con el precio | Mostrar cuánto cuesta |
 | `#oferta` | Sello brillante de descuento | Porcentajes y 2×1 |
-| `#servicio` | Lista de servicios con visto | Qué ofreces (`|` separa los servicios) |
+| `#servicio` | Lista de servicios con visto | Qué ofreces (`|` separa) |
 | `#horario` | Reloj con tu horario | Días y horas de atención |
 | `#contacto` | Teléfono con ondas | WhatsApp, celular, redes |
 | `#ubicacion` | Pin de mapa animado | Dirección o local |
 | `#cta` | Botón grande de acción | “Reserva”, “compra”, “escríbenos” |
 
-Si no pones prefijo, la app elige una forma según el contenido: precios → `#precio`, descuentos → `#oferta`, WhatsApp o teléfonos → `#contacto`, direcciones → `#ubicacion`, días y horas → `#horario`, verbos como “reserva” → `#cta`, servicios → `#servicio`, números → `#numero`, “vs” → `#comparar`, listas con comas → `#pasos`, y así.
+Si no pones prefijo, la app elige una forma según el contenido: precios → `#precio`, descuentos → `#oferta`, WhatsApp → `#contacto`, direcciones → `#ubicacion`, días y horas → `#horario`, servicios → `#servicio`, números → `#numero`, “vs” → `#comparar`, listas con comas → `#pasos`, y así.
 
 ### Ejemplo listo para probar
 
 Pulsa **Usar ejemplo** dentro de la app:
 
 ```
-#personaje ¡Hola! Hoy veremos la fotosíntesis
-#idea La fotosíntesis
-#flecha Las plantas usan luz, agua y CO2
-#pasos Absorben agua | Capturan la luz | Liberan oxígeno
-#grafico Así crece su energía
-#numero 6 CO2 + 6 H2O
-#formula 6CO2 + 6H2O = C6H12O6 + 6O2
-#check Por eso limpian el aire
-#personaje ¡Tú puedes! Cuida las plantas
+#personaje ¡Muy buenas! Soy don Ramón
+#servicio Reparamos celulares | Tablets | Computadoras
+#check Diagnóstico gratis en el acto
+#precio Desde $25 con garantía
+#oferta 20% de descuento esta semana
+#horario De lunes a sábado, de 9 a 19
+#ubicacion Av. Central 123, frente al parque
+#contacto WhatsApp 555 123 4567
+#cta ¡Escríbenos y te atendemos hoy!
 ```
 
-### Personajes animados
+### Personajes
 
-En **Formato y estilo → Personaje** eliges quién acompaña el video:
+En **Formato y estilo → Personaje** eliges quién acompaña el video. Cada uno tiene **su propio tono de voz**:
 
-| Personaje | Estilo |
-|---|---|
-| **Búho** | Búho redondo y simpático (predeterminado) |
-| **Gatito** | Gato naranja con bigotes y cola |
-| **Robot** | Robot azul con pantalla y antena |
-| **Plantita** | Flor con maceta y hojas |
-| **Nubecita** | Nube esponjosa con bracitos |
-| **Sin personaje** | Solo las formas y el texto |
+| Personaje | Estilo | Voz |
+|---|---|---|
+| **Señor** (predeterminado) | Señor con traje, canas, bigote y gafas; abre y cierra la boca al hablar | Grave y cálida |
+| **Perrito** | Perro de orejas caídas y lengua fuera | Ronca |
+| **Gatito** | Gato naranja con bigotes y cola | Aguda y juguetona |
+| **Conejito** | Conejo blanco de orejas largas y dientes | Muy aguda |
+| **Zorrito** | Zorro naranja con cola de punta blanca | Pícara |
+| **Ranita** | Rana verde de ojos saltones | Muy grave |
+| **Lorito** | Loro verde con cresta y pico curvo | Aguda y rápida |
+| **Búho** | Búho redondo | Media |
+| **Robot** | Robot azul con pantalla y antena | Neutra |
+| **Plantita** | Flor con maceta y hojas | Suave |
+| **Nubecita** | Nube esponjosa con bracitos | Suave y aguda |
+| **Sin personaje** | Solo las formas y el texto | — |
 
-El personaje aparece como **mascota pequeña** en la esquina inferior derecha de cada escena. Reacciona a lo que se dibuja: levanta la mano al señalar (`#flecha`, `#pasos`…), celebra en `#check` y se asombra con `#idea`. También parpadea y se mueve suavemente.
+El personaje aparece como **mascota pequeña** en la esquina inferior derecha de cada escena. Reacciona a lo que se dibuja: levanta la mano al señalar, celebra en `#check` y se asombra con `#idea`. También parpadea y se mueve suavemente.
 
-Con `#personaje` el personaje sale **grande y centrado**, saluda y dice tu texto en un **globo de diálogo**. Ideal para una intro y un cierre:
+Con `#personaje` sale **grande y centrado**, saluda y dice tu texto en un **globo de diálogo**:
 
 ```
-#personaje ¡Hola! Hoy veremos la fotosíntesis
+#personaje ¡Hola! Soy don Ramón, tu técnico de confianza
 ...tus escenas...
-#personaje ¡Tú puedes! Cuida las plantas
+#personaje ¡Te esperamos! Pregunta por WhatsApp
 ```
 
 > El globo muestra hasta 4 líneas; si el texto es muy largo, la app reduce la letra y recorta el resto. Para que se lea bien, usa frases cortas (menos de 90 caracteres).
@@ -144,21 +139,17 @@ Con `#personaje` el personaje sale **grande y centrado**, saluda y dice tu texto
 ### Escenas con varios elementos
 
 - **Pasos:** separa con `|`, `;` o `·`:
-  `#pasos Absorben agua | Capturan la luz | Liberan oxígeno`
+  `#pasos Diagnóstico | Reparación | Garantía`
 - **Comparación:** usa `vs`, `versus`, `frente a` o `contra`:
-  `#comparar Mitosis vs Meiosis`
+  `#comparar Reparar vs Comprar`
 - **Número:** la app toma la primera cifra del texto:
-  `#numero 71% del planeta es agua`
-- **Fórmula:** escribe la ecuación completa:
-  `#formula E = mc²`
-- **Personaje hablando:** escribe la frase que dirá en el globo:
-  `#personaje ¡Hola! Hoy veremos algo increíble`
+  `#numero 20% de descuento`
+- **Servicios:** separa con `|`:
+  `#servicio Celulares | Tablets | Computadoras`
 
 ---
 
 ### Paletas
-
-En **Formato y estilo → Paleta** puedes elegir:
 
 | Paleta | Estilo |
 |---|---|
@@ -166,31 +157,31 @@ En **Formato y estilo → Paleta** puedes elegir:
 | **Pizarra verde** | Verde pizarra con detalles cálidos |
 | **Papel y tinta** | Claro, tipo cuaderno |
 | **Neón** | Violeta y cian brillantes |
-| **Frutiger Aero** | Cielo y agua brillantes, colina verde, cristal, reflejos y burbujas en movimiento |
+| **Frutiger Aero** | Cielo y agua brillantes, colina verde, cristal y burbujas |
 
-Frutiger Aero es la paleta pensada para anuncios: fondo luminoso, texto con sombra para que se lea sobre el agua y etiquetas en azul oscuro.
+Frutiger Aero es la paleta pensada para anuncios: fondo luminoso y texto con sombra para que se lea sobre el agua.
 
 ---
 
 ## 3. Audio
 
-- **Música de fondo:** elige un archivo MP3/M4A/OGG. Se repite en bucle y se mezcla con el video. Baja automáticamente cuando hay voz para que se entienda.
-- **Voz natural:** la app lee tu guion con una voz de Google, gratis y sin cuentas. Elige **español** (`es-ES`) o **latino** (`es-MX`).
-- **Narración grabada:** elige un audio ya grabado (nota de voz, etc.). Se reproduce una vez desde el inicio.
-- **Mi voz con el micrófono:** narra en vivo durante la cuenta regresiva y la animación. El navegador pedirá permiso la primera vez.
+- **Voz clásica de locutor (incluida):** lee el guion con una voz masculina de estilo Loquendo, **sin internet y sin límite**. Es la opción predeterminada.
+- **Voz clásica latina:** igual, con acento latino.
+- **Voz natural:** voz de Google (necesita internet al generar). Se descarga una vez por frase y queda guardada.
+- **Música de fondo:** MP3/M4A/OGG en bucle. Baja automáticamente cuando hay voz.
+- **Narración grabada:** un audio ya grabado, una sola vez desde el inicio.
+- **Mi voz con el micrófono:** narra en vivo durante la animación. El navegador pide permiso.
 - **Volumen de la música:** se mezcla aparte de la voz.
 
-### Cómo funciona la voz natural
+### Cómo funciona la voz clásica
 
-1. Al pulsar **Generar video**, la app divide el guion en frases de menos de 170 caracteres.
-2. Descarga cada frase como MP3 y calcula su duración real; cada escena dura lo que dura su voz más un segundo de margen.
-3. La voz se limpia y se realza (filtro de graves, presencia, compresor) para que suene menos robótica.
-4. El MP3 queda guardado en el teléfono (Cache Storage `reels-voz-v1`). La próxima vez con el mismo texto no se descarga.
-5. Si no hay internet o la descarga falla, el video se graba **sin voz** y la app te avisa.
+1. La app lleva dentro un motor de voz libre (**meSpeak/eSpeak**) con las voces `es` y `es-la`; no hay que instalar ni descargar nada.
+2. Al pulsar **Generar video**, divide el guion en frases y sintetiza cada una en el dispositivo.
+3. El audio pasa por una cadena de locutor (cuerpo en los graves, menos dureza, compresión y volumen parejo) para que suene más natural que el robot clásico.
+4. Cada escena dura lo que dura su voz más un margen; el personaje mueve la boca mientras habla.
+5. En la primera generación tarda un segundo en cargar el motor; después es inmediato.
 
-Puedes escuchar una muestra con **Escuchar prueba de voz** antes de generar.
-
-> La voz natural sí necesita internet al generar el video: el texto se envía a Google Translate TTS y el audio se copia mediante un proxy CORS público. No se envía nada más. El resto del video se genera en tu dispositivo.
+Puedes escuchar una muestra con **Escuchar prueba de voz**, que usa el tono del personaje elegido.
 
 El video siempre incluye una pista de audio (aunque esté en silencio) para que las redes sociales lo acepten.
 
@@ -198,10 +189,9 @@ El video siempre incluye una pista de audio (aunque esté en silencio) para que 
 
 ## 4. Consejos para grabar
 
-- Usa la **calidad 720p** en celulares modestos; 1080p tarda más y puede bajar los FPS.
+- Usa **calidad 720p** en celulares modestos; 1080p tarda más y puede bajar los FPS.
 - Graba en **silencio** y con el celular estable.
 - Mantén la app en primer plano y la pantalla encendida (la app pide *wake lock* mientras graba).
-- Para narrar: primero escribe el guion, ensaya con **play**, y luego graba.
 - El video se genera en tiempo real: no cierres la app ni bloquees el teléfono durante la grabación.
 - TikTok e Instagram aceptan MP4 directamente. Si tu navegador grabó en WebM, usa **Compartir** desde la app o conviértelo después.
 
@@ -209,12 +199,12 @@ El video siempre incluye una pista de audio (aunque esté en silencio) para que 
 
 ## 5. Privacidad
 
-Todo ocurre en tu dispositivo, con una excepción: la voz natural.
+Todo ocurre en tu dispositivo. La voz clásica se genera localmente, así que **no se envía el guion a ningún servidor**.
 
 - El guion se guarda solo en `localStorage` de tu navegador.
-- La música, la narración, la voz descargada y el micrófono se procesan con Web Audio en memoria.
+- La música, la narración, la voz y el micrófono se procesan con Web Audio en memoria.
 - El video se graba con `MediaRecorder` y no sale del teléfono.
-- Si eliges **voz natural**, solo el texto de cada frase viaja a Google Translate TTS para obtener el audio; el MP3 se guarda en la caché del teléfono. Si eliges **sin voz**, **micrófono** o **narración importada**, no se envía nada.
+- Solo si eliges **voz natural** el texto de cada frase viaja a Google Translate TTS. Con **voz clásica**, **sin voz**, **micrófono** o **narración importada** no se envía nada.
 - No hay servidor propio, cuentas, analíticas ni límite de videos.
 
 ---
@@ -227,15 +217,16 @@ reels-movil/
 ├── css/estilos.css            Estilos móviles y de escritorio
 ├── js/dibujos.js              Paletas, formas y personajes animados (Canvas 2D)
 ├── js/motor.js                Guion → escenas, textos y cuadros
-├── js/voz.js                  Voz natural: descarga, caché y duraciones
+├── js/voz.js                  Voz clásica (meSpeak), pulido y voz natural
 ├── js/grabador.js             MediaRecorder + mezcla de audio
 ├── js/app.js                  Interfaz, vista previa, PWA
+├── js/mespeak/                Motor de voz libre y voces es / es-la
 ├── sw.js                      Service worker (modo offline)
 ├── manifest.webmanifest       Manifest de instalación
 ├── iconos/                    Iconos 192/512/maskable/apple
 ├── herramientas/
 │   ├── hacer_iconos.py        Regenera los iconos (Pillow)
-│   └── empaquetar.py          Genera reel-educativo.html
+│   └── empaquetar.py          Genera reel-aero.html
 └── LEEME.md
 ```
 
@@ -243,21 +234,21 @@ reels-movil/
 
 ## 7. Personalizar
 
-- **Paletas:** `js/dibujos.js` → objeto `PALETAS`. Cambia `fondo`, `acento`, `acento2`, `tinta`.
-- **Personajes:** `js/dibujos.js` → `PERSONAJES` (lista y nombres) y `COLORES_PERSONAJE` (colores de cada personaje). Cada personaje tiene su función `dibujarBuho`, `dibujarGato`, etc.; recibe `(ctx, colores, pose, tiempo)`.
-- **Formas:** en `js/dibujos.js`, cada función `dibujar…` recibe `(ctx, R, progreso, colores, escena, tiempo)`. Puedes ajustar tamaños y tiempos.
+- **Paletas:** `js/dibujos.js` → objeto `PALETAS`.
+- **Personajes:** `js/dibujos.js` → `PERSONAJES` (nombre y voz), `COLORES_PERSONAJE` (colores) y una función `dibujar…` por personaje, que recibe `(ctx, colores, pose, tiempo)`.
+- **Tono de voz:** en `PERSONAJES`, cada entrada tiene `voz: { pitch, speed }`. `pitch` va de 20 a 80 y `speed` de 135 a 190.
+- **Pulido de la voz:** `js/voz.js` → `pulirVoz()`, con los filtros y el compresor.
+- **Formas:** cada función `dibujar…` de `js/dibujos.js` recibe `(ctx, R, progreso, colores, escena, tiempo)`.
 - **Duración por escena:** `js/motor.js` → `1.15 + palabras / (2.5 * velocidad)`, con límites `2.4`–`9.5` segundos.
-- **Transiciones:** `js/motor.js` → constante `TRANSICION` (0.32 s).
 - **Estilos:** `css/estilos.css` usa variables CSS al inicio del archivo.
-- **Iconos:** edita y ejecuta `python herramientas/hacer_iconos.py`.
 
-Después de cambiar archivos, sube la versión del caché en `sw.js` (`reels-educativos-v6` → `v7`) y haz `git push` para que los dispositivos instalados reciban los cambios.
+Después de cambiar archivos, sube la versión del caché en `sw.js` (`reels-aero-v15` → `v16`) y haz `git push` para que los dispositivos instalados reciban los cambios.
 
 ---
 
 ## 8. Compatibilidad
 
-| Navegador | Grabar | Micrófono | Voz natural | Instalar |
+| Navegador | Grabar | Micrófono | Voz clásica | Instalar |
 |---|---|---|---|---|
 | Chrome Android (actual) | MP4 | Sí | Sí | Sí |
 | Safari iPhone 16+ | MP4 | Sí | Sí | Sí |
@@ -268,4 +259,4 @@ Si un navegador no soporta `MediaRecorder` o `canvas.captureStream`, la app avis
 
 ---
 
-Hecho para clases cortas: una idea, una forma, un video.
+Hecho para anuncios cortos: un negocio, una idea, un video que habla.

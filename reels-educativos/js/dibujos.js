@@ -1027,11 +1027,17 @@
   /* ---------- personajes ---------- */
 
   var PERSONAJES = [
-    { id: 'buho', nombre: 'Búho' },
-    { id: 'gato', nombre: 'Gatito' },
-    { id: 'robot', nombre: 'Robot' },
-    { id: 'planta', nombre: 'Plantita' },
-    { id: 'nube', nombre: 'Nubecita' },
+    { id: 'senor', nombre: 'Señor', voz: { pitch: 40, speed: 162 } },
+    { id: 'perro', nombre: 'Perrito', voz: { pitch: 33, speed: 165 } },
+    { id: 'gato', nombre: 'Gatito', voz: { pitch: 58, speed: 168 } },
+    { id: 'conejo', nombre: 'Conejito', voz: { pitch: 68, speed: 172 } },
+    { id: 'zorro', nombre: 'Zorrito', voz: { pitch: 50, speed: 164 } },
+    { id: 'rana', nombre: 'Ranita', voz: { pitch: 30, speed: 152 } },
+    { id: 'loro', nombre: 'Lorito', voz: { pitch: 62, speed: 176 } },
+    { id: 'buho', nombre: 'Búho', voz: { pitch: 46, speed: 158 } },
+    { id: 'robot', nombre: 'Robot', voz: { pitch: 44, speed: 160 } },
+    { id: 'planta', nombre: 'Plantita', voz: { pitch: 54, speed: 156 } },
+    { id: 'nube', nombre: 'Nubecita', voz: { pitch: 60, speed: 158 } },
     { id: 'ninguno', nombre: 'Sin personaje' }
   ];
 
@@ -1045,6 +1051,35 @@
       cuerpo: '#ff9d63', cuerpo2: '#ef8348', panza: '#ffe6d4',
       borde: '#9c4e24', pupila: '#3b2114', blanco: '#fffaf4',
       mejilla: 'rgba(255,120,150,0.42)', boca: '#b5405c'
+    },
+    perro: {
+      cuerpo: '#dda45f', cuerpo2: '#c18543', panza: '#ffeacd',
+      borde: '#7d5527', pupila: '#3a2a18', blanco: '#fffaf2',
+      oreja: '#a8703a', hocico: '#ffe3bd', nariz: '#3b2a1c',
+      lengua: '#ff8095', mejilla: 'rgba(255,120,120,0.35)', boca: '#a3404f'
+    },
+    conejo: {
+      cuerpo: '#f8f4ff', cuerpo2: '#e2d9f3', panza: '#ffffff',
+      borde: '#8f83a8', pupila: '#43375a', blanco: '#ffffff',
+      oreja: '#ffc2d6', nariz: '#ff8fab',
+      mejilla: 'rgba(255,140,180,0.42)', boca: '#b5405c'
+    },
+    zorro: {
+      cuerpo: '#f0893c', cuerpo2: '#d9702a', panza: '#fff3e2',
+      borde: '#8f4a15', pupila: '#3a2413', blanco: '#fffaf2',
+      hocico: '#fff6ea', nariz: '#33241a', cola: '#ffb066',
+      mejilla: 'rgba(255,120,120,0.32)', boca: '#a3404f'
+    },
+    rana: {
+      cuerpo: '#8ada5c', cuerpo2: '#66bd3c', panza: '#eaffd6',
+      borde: '#4a7d2b', pupila: '#26361a', blanco: '#ffffff',
+      mejilla: 'rgba(255,120,150,0.30)', boca: '#8f2f45'
+    },
+    loro: {
+      cuerpo: '#46c07a', cuerpo2: '#2f9d5f', panza: '#ffe07a',
+      borde: '#20603c', pupila: '#1f2a1c', blanco: '#ffffff',
+      pico: '#ffb03a', pico2: '#e08a1c', cresta: '#ff6f6f',
+      mejilla: 'rgba(255,120,120,0.35)', boca: '#8f2f45'
     },
     robot: {
       cuerpo: '#9bd9f5', cuerpo2: '#6fc3e8', panza: '#eafaff',
@@ -1061,6 +1096,15 @@
       cuerpo: '#e9f5ff', cuerpo2: '#c9e7fb', panza: '#ffffff',
       borde: '#5f9dbf', pupila: '#2c4a63', blanco: '#ffffff',
       mejilla: 'rgba(120,170,255,0.35)', boca: '#b5405c'
+    },
+    senor: {
+      cuerpo: '#3f6ea8', cuerpo2: '#345c8e', camisa: '#f7fbff', panza: '#f7fbff',
+      borde: '#1e3a56', pupila: '#243b53', blanco: '#fffdf8',
+      pelo: '#d9dfe6', pelo2: '#aeb9c5', piel: '#f4c9a4', piel2: '#e3a97e',
+      gafas: '#2b3d50', corbata: '#d0505f', corbata2: '#a83a49',
+      pantalon: '#2f485f', zapato: '#22303d', bolsillo: '#f7fbff',
+      mejilla: 'rgba(230,120,120,0.28)', boca: '#7e2f3f', boca2: '#c4636f',
+      diente: '#fffdf8'
     }
   };
 
@@ -1350,6 +1394,280 @@
     brazosCaricatura(ctx, col, pose, t, 0.42, 0.44, 0.13);
   }
 
+  function dibujarPerro(ctx, col, pose, t) {
+    var parp = (t % 4.5) < 0.10;
+    var mir = pose === 'point' ? -1 : 0;
+    var modo = pose === 'celebrate' ? 'feliz' : (pose === 'idea' ? 'asombrado' : 'normal');
+
+    elip(ctx, 0, 1.09, 0.50, 0.09, 'rgba(0,0,0,0.20)', null, 0);
+
+    /* cola */
+    ctx.save();
+    ctx.strokeStyle = col.cuerpo2;
+    ctx.lineWidth = 0.13;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0.38, 0.66);
+    ctx.quadraticCurveTo(0.94, 0.60, 0.80, 0.14);
+    ctx.stroke();
+    ctx.restore();
+
+    /* cuerpo y patas */
+    elip(ctx, 0, 0.62, 0.47, 0.43, col.cuerpo, col.borde, 0.04);
+    elip(ctx, 0, 0.70, 0.27, 0.25, col.panza, null, 0);
+    elip(ctx, -0.24, 0.99, 0.15, 0.085, col.panza, col.borde, 0.022);
+    elip(ctx, 0.24, 0.99, 0.15, 0.085, col.panza, col.borde, 0.022);
+
+    /* orejas caídas */
+    elip(ctx, -0.47, -0.20, 0.16, 0.31, col.oreja, col.borde, 0.032, -0.30);
+    elip(ctx, 0.47, -0.20, 0.16, 0.31, col.oreja, col.borde, 0.032, 0.30);
+
+    /* cabeza */
+    elip(ctx, 0, -0.34, 0.49, 0.46, col.cuerpo, col.borde, 0.042);
+    elip(ctx, 0.17, -0.62, 0.17, 0.13, col.cuerpo2, null, 0, -0.25);
+
+    /* hocico, nariz y lengua */
+    elip(ctx, 0, -0.10, 0.27, 0.22, col.hocico, col.borde, 0.026);
+    elip(ctx, 0, -0.16, 0.10, 0.078, col.nariz, null, 0);
+    if (pose === 'celebrate' || pose === 'idea') {
+      elip(ctx, 0.02, 0.10, 0.075, 0.10, col.lengua, col.borde, 0.018);
+    }
+
+    ojoCaricatura(ctx, -0.20, -0.44, 0.135, col, modo, parp, mir);
+    ojoCaricatura(ctx, 0.20, -0.44, 0.135, col, modo, parp, mir);
+
+    ctx.save();
+    ctx.strokeStyle = col.pupila;
+    ctx.lineWidth = 0.022;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-0.09, 0.02);
+    ctx.quadraticCurveTo(0, 0.09, 0.09, 0.02);
+    ctx.stroke();
+    ctx.restore();
+
+    mejillas(ctx, 0.40, -0.16, 0.10, col.mejilla);
+    brazosCaricatura(ctx, col, pose, t, 0.42, 0.46, 0.13);
+  }
+
+  function dibujarConejo(ctx, col, pose, t) {
+    var parp = (t % 4.0) < 0.10;
+    var mir = pose === 'point' ? -1 : 0;
+    var modo = pose === 'celebrate' ? 'feliz' : (pose === 'idea' ? 'asombrado' : 'normal');
+    var salto = pose === 'celebrate' ? Math.max(0, Math.sin(t * 7)) * 0.07 : 0;
+
+    elip(ctx, 0, 1.09, 0.46, 0.085, 'rgba(0,0,0,0.20)', null, 0);
+
+    ctx.save();
+    ctx.translate(0, -salto);
+
+    /* orejas largas */
+    [-1, 1].forEach(function (s) {
+      elip(ctx, s * 0.23, -0.98, 0.13, 0.42, col.cuerpo, col.borde, 0.032, s * 0.18);
+      elip(ctx, s * 0.23, -0.98, 0.07, 0.31, col.oreja, null, 0, s * 0.18);
+    });
+
+    /* cuerpo y patas */
+    elip(ctx, 0, 0.64, 0.44, 0.42, col.cuerpo, col.borde, 0.04);
+    elip(ctx, 0, 0.72, 0.24, 0.24, col.panza, null, 0);
+    elip(ctx, -0.22, 1.00, 0.14, 0.08, col.panza, col.borde, 0.022);
+    elip(ctx, 0.22, 1.00, 0.14, 0.08, col.panza, col.borde, 0.022);
+
+    /* cabeza */
+    elip(ctx, 0, -0.36, 0.44, 0.42, col.cuerpo, col.borde, 0.04);
+
+    ojoCaricatura(ctx, -0.17, -0.42, 0.125, col, modo, parp, mir);
+    ojoCaricatura(ctx, 0.17, -0.42, 0.125, col, modo, parp, mir);
+
+    elip(ctx, 0, -0.19, 0.07, 0.055, col.nariz, col.borde, 0.016);
+
+    ctx.save();
+    ctx.strokeStyle = col.pupila;
+    ctx.lineWidth = 0.020;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-0.07, -0.12);
+    ctx.quadraticCurveTo(0, -0.05, 0.07, -0.12);
+    ctx.stroke();
+    ctx.restore();
+
+    /* dientes de conejo */
+    caja(ctx, -0.078, -0.05, 0.062, 0.085, 0.014, col.blanco, col.borde, 0.014);
+    caja(ctx, 0.016, -0.05, 0.062, 0.085, 0.014, col.blanco, col.borde, 0.014);
+
+    mejillas(ctx, 0.30, -0.28, 0.085, col.mejilla);
+    brazosCaricatura(ctx, col, pose, t, 0.44, 0.40, 0.12);
+    ctx.restore();
+  }
+
+  function dibujarZorro(ctx, col, pose, t) {
+    var parp = (t % 4.7) < 0.10;
+    var mir = pose === 'point' ? -1 : 0;
+    var modo = pose === 'celebrate' ? 'feliz' : (pose === 'idea' ? 'asombrado' : 'normal');
+
+    elip(ctx, 0, 1.09, 0.50, 0.09, 'rgba(0,0,0,0.20)', null, 0);
+
+    /* cola con punta blanca */
+    ctx.save();
+    ctx.fillStyle = col.cola;
+    ctx.strokeStyle = col.borde;
+    ctx.lineWidth = 0.032;
+    ctx.beginPath();
+    ctx.moveTo(0.32, 0.78);
+    ctx.bezierCurveTo(1.04, 0.98, 1.00, 0.22, 0.56, 0.30);
+    ctx.bezierCurveTo(0.78, 0.46, 0.70, 0.76, 0.32, 0.78);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    elip(ctx, 0.84, 0.56, 0.15, 0.18, col.panza, null, 0, -0.5);
+    ctx.restore();
+
+    /* cuerpo y patas */
+    elip(ctx, 0, 0.62, 0.46, 0.43, col.cuerpo, col.borde, 0.04);
+    elip(ctx, 0, 0.70, 0.26, 0.25, col.panza, null, 0);
+    elip(ctx, -0.23, 0.99, 0.14, 0.085, col.cuerpo2, col.borde, 0.022);
+    elip(ctx, 0.23, 0.99, 0.14, 0.085, col.cuerpo2, col.borde, 0.022);
+
+    /* orejas puntiagudas */
+    ctx.save();
+    ctx.fillStyle = col.cuerpo2;
+    ctx.strokeStyle = col.borde;
+    ctx.lineWidth = 0.030;
+    [-1, 1].forEach(function (s) {
+      ctx.beginPath();
+      ctx.moveTo(s * 0.22, -0.68);
+      ctx.lineTo(s * 0.60, -1.16);
+      ctx.lineTo(s * 0.62, -0.50);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    });
+    ctx.restore();
+
+    /* cabeza */
+    elip(ctx, 0, -0.34, 0.47, 0.43, col.cuerpo, col.borde, 0.04);
+    elip(ctx, 0, -0.02, 0.25, 0.20, col.hocico, col.borde, 0.022);
+    elip(ctx, 0, -0.08, 0.085, 0.068, col.nariz, null, 0);
+
+    ojoCaricatura(ctx, -0.19, -0.44, 0.13, col, modo, parp, mir);
+    ojoCaricatura(ctx, 0.19, -0.44, 0.13, col, modo, parp, mir);
+
+    ctx.save();
+    ctx.strokeStyle = col.pupila;
+    ctx.lineWidth = 0.020;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-0.055, 0.04);
+    ctx.quadraticCurveTo(0, 0.09, 0.055, 0.04);
+    ctx.stroke();
+    ctx.restore();
+
+    mejillas(ctx, 0.36, -0.20, 0.10, col.mejilla);
+    brazosCaricatura(ctx, col, pose, t, 0.42, 0.45, 0.13);
+  }
+
+  function dibujarRana(ctx, col, pose, t) {
+    var parp = (t % 3.9) < 0.10;
+    var mir = pose === 'point' ? -1 : 0;
+    var modo = pose === 'celebrate' ? 'feliz' : (pose === 'idea' ? 'asombrado' : 'normal');
+
+    elip(ctx, 0, 1.09, 0.52, 0.09, 'rgba(0,0,0,0.20)', null, 0);
+
+    /* patas */
+    elip(ctx, -0.46, 0.94, 0.20, 0.10, col.cuerpo2, col.borde, 0.024);
+    elip(ctx, 0.46, 0.94, 0.20, 0.10, col.cuerpo2, col.borde, 0.024);
+
+    /* cuerpo */
+    elip(ctx, 0, 0.52, 0.60, 0.52, col.cuerpo, col.borde, 0.045);
+    elip(ctx, 0, 0.66, 0.34, 0.30, col.panza, null, 0);
+
+    /* ojos saltones */
+    elip(ctx, -0.26, -0.36, 0.22, 0.22, col.cuerpo, col.borde, 0.032);
+    elip(ctx, 0.26, -0.36, 0.22, 0.22, col.cuerpo, col.borde, 0.032);
+    ojoCaricatura(ctx, -0.26, -0.38, 0.112, col, modo, parp, mir);
+    ojoCaricatura(ctx, 0.26, -0.38, 0.112, col, modo, parp, mir);
+
+    /* boca ancha */
+    ctx.save();
+    ctx.strokeStyle = col.pupila;
+    ctx.lineWidth = 0.028;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-0.34, 0.10);
+    ctx.quadraticCurveTo(0, 0.34, 0.34, 0.10);
+    ctx.stroke();
+    ctx.restore();
+
+    mejillas(ctx, 0.44, 0.10, 0.09, col.mejilla);
+    brazosCaricatura(ctx, col, pose, t, 0.34, 0.56, 0.11);
+  }
+
+  function dibujarLoro(ctx, col, pose, t) {
+    var parp = (t % 4.2) < 0.09;
+    var mir = pose === 'point' ? -1 : 0;
+    var modo = pose === 'celebrate' ? 'feliz' : (pose === 'idea' ? 'asombrado' : 'normal');
+
+    elip(ctx, 0, 1.09, 0.46, 0.085, 'rgba(0,0,0,0.20)', null, 0);
+
+    /* cola */
+    ctx.save();
+    ctx.fillStyle = col.pico2;
+    ctx.strokeStyle = col.borde;
+    ctx.lineWidth = 0.028;
+    ctx.beginPath();
+    ctx.moveTo(-0.16, 0.84);
+    ctx.lineTo(0.16, 0.84);
+    ctx.lineTo(0.10, 1.08);
+    ctx.lineTo(-0.10, 1.08);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    /* cuerpo y patas */
+    elip(ctx, 0, 0.52, 0.43, 0.52, col.cuerpo, col.borde, 0.042);
+    elip(ctx, 0, 0.62, 0.25, 0.34, col.panza, null, 0);
+    elip(ctx, -0.20, 0.99, 0.13, 0.075, col.pico2, col.borde, 0.020);
+    elip(ctx, 0.20, 0.99, 0.13, 0.075, col.pico2, col.borde, 0.020);
+
+    /* cresta */
+    ctx.save();
+    ctx.fillStyle = col.cresta;
+    ctx.strokeStyle = col.borde;
+    ctx.lineWidth = 0.022;
+    ctx.beginPath();
+    ctx.moveTo(-0.10, -0.66);
+    ctx.quadraticCurveTo(-0.04, -0.94, 0.06, -0.68);
+    ctx.quadraticCurveTo(0.12, -0.92, 0.20, -0.60);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    /* cabeza */
+    elip(ctx, 0, -0.30, 0.40, 0.40, col.cuerpo, col.borde, 0.04);
+
+    ojoCaricatura(ctx, -0.16, -0.38, 0.115, col, modo, parp, mir);
+    ojoCaricatura(ctx, 0.16, -0.38, 0.115, col, modo, parp, mir);
+
+    /* pico curvado */
+    ctx.save();
+    ctx.fillStyle = col.pico;
+    ctx.strokeStyle = col.borde;
+    ctx.lineWidth = 0.024;
+    ctx.beginPath();
+    ctx.moveTo(-0.11, -0.17);
+    ctx.quadraticCurveTo(0.14, -0.22, 0.12, 0.06);
+    ctx.quadraticCurveTo(0.00, -0.02, -0.11, -0.17);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    mejillas(ctx, 0.31, -0.14, 0.085, col.mejilla);
+    brazosCaricatura(ctx, col, pose, t, 0.34, 0.44, 0.12);
+  }
+
   function dibujarRobot(ctx, col, pose, t) {
     var parp = (t % 5.0) < 0.08;
     var modo = pose === 'celebrate' ? 'feliz' : 'normal';
@@ -1524,12 +1842,238 @@
     brazosCaricatura(ctx, col, pose, t, 0.16, 0.55, 0.075);
   }
 
+  /* Envolvente irregular para que la boca del señor se abra y cierre como
+     si estuviera hablando, con pequeñas pausas entre frases. */
+  function bocaHablando(t) {
+    var a = Math.sin(t * 9.3) * 0.55 + Math.sin(t * 15.1 + 1.2) * 0.30 + Math.sin(t * 5.7 + 0.6) * 0.15;
+    var puerta = Math.sin(t * 1.7 + 0.4) > 0.55 ? 0 : 1;
+    return limitar(a, 0, 1) * puerta;
+  }
+
+  function dibujarSenor(ctx, col, pose, t) {
+    var parp = (t % 4.4) < 0.10;
+    var mir = pose === 'point' ? -1 : 0;
+    var modo = pose === 'celebrate' ? 'feliz' : (pose === 'idea' ? 'asombrado' : 'normal');
+    var habla = bocaHablando(t);
+
+    elip(ctx, 0, 1.10, 0.52, 0.09, 'rgba(0,0,0,0.20)', null, 0);
+
+    /* pantalón y zapatos */
+    caja(ctx, -0.28, 0.58, 0.22, 0.46, 0.09, col.pantalon, col.borde, 0.025);
+    caja(ctx, 0.06, 0.58, 0.22, 0.46, 0.09, col.pantalon, col.borde, 0.025);
+    elip(ctx, -0.17, 1.02, 0.17, 0.085, col.zapato, col.borde, 0.02);
+    elip(ctx, 0.17, 1.02, 0.17, 0.085, col.zapato, col.borde, 0.02);
+
+    /* cuello */
+    caja(ctx, -0.10, -0.14, 0.20, 0.22, 0.05, col.piel2, null, 0);
+
+    /* saco */
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(-0.42, 0.05);
+    ctx.quadraticCurveTo(-0.53, 0.36, -0.38, 0.70);
+    ctx.quadraticCurveTo(0, 0.80, 0.38, 0.70);
+    ctx.quadraticCurveTo(0.53, 0.36, 0.42, 0.05);
+    ctx.closePath();
+    var gs = ctx.createLinearGradient(-0.42, 0, 0.42, 0);
+    gs.addColorStop(0, col.cuerpo2);
+    gs.addColorStop(0.5, col.cuerpo);
+    gs.addColorStop(1, col.cuerpo2);
+    ctx.fillStyle = gs;
+    ctx.fill();
+    ctx.strokeStyle = col.borde;
+    ctx.lineWidth = 0.035;
+    ctx.stroke();
+    ctx.restore();
+
+    /* camisa */
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(-0.17, 0.03);
+    ctx.lineTo(0.17, 0.03);
+    ctx.lineTo(0.10, 0.64);
+    ctx.lineTo(-0.10, 0.64);
+    ctx.closePath();
+    ctx.fillStyle = col.camisa;
+    ctx.fill();
+    ctx.restore();
+
+    /* solapas */
+    ctx.save();
+    ctx.strokeStyle = col.borde;
+    ctx.lineWidth = 0.025;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-0.17, 0.03);
+    ctx.lineTo(-0.03, 0.30);
+    ctx.lineTo(-0.20, 0.47);
+    ctx.moveTo(0.17, 0.03);
+    ctx.lineTo(0.03, 0.30);
+    ctx.lineTo(0.20, 0.47);
+    ctx.stroke();
+    ctx.restore();
+
+    /* pañuelo del bolsillo */
+    ctx.save();
+    ctx.fillStyle = col.bolsillo;
+    ctx.beginPath();
+    ctx.moveTo(-0.30, 0.30);
+    ctx.lineTo(-0.20, 0.30);
+    ctx.lineTo(-0.25, 0.20);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    /* corbata */
+    ctx.save();
+    ctx.fillStyle = col.corbata;
+    ctx.strokeStyle = col.corbata2;
+    ctx.lineWidth = 0.018;
+    ctx.beginPath();
+    ctx.moveTo(-0.055, 0.09);
+    ctx.lineTo(0.055, 0.09);
+    ctx.lineTo(0.045, 0.18);
+    ctx.lineTo(-0.045, 0.18);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-0.045, 0.18);
+    ctx.lineTo(0.045, 0.18);
+    ctx.lineTo(0.075, 0.44);
+    ctx.lineTo(0, 0.53);
+    ctx.lineTo(-0.075, 0.44);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    brazosCaricatura(ctx, col, pose, t, 0.22, 0.44, 0.14);
+
+    /* orejas */
+    elip(ctx, -0.43, -0.47, 0.09, 0.12, col.piel, col.borde, 0.025);
+    elip(ctx, 0.43, -0.47, 0.09, 0.12, col.piel, col.borde, 0.025);
+
+    /* cabeza */
+    elip(ctx, 0, -0.48, 0.42, 0.45, col.piel, col.borde, 0.035);
+
+    /* pelo canoso con raya al medio */
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(-0.425, -0.53);
+    ctx.bezierCurveTo(-0.47, -1.03, 0.47, -1.03, 0.425, -0.53);
+    ctx.bezierCurveTo(0.34, -0.71, 0.18, -0.77, 0, -0.77);
+    ctx.bezierCurveTo(-0.18, -0.77, -0.34, -0.71, -0.425, -0.53);
+    ctx.closePath();
+    ctx.fillStyle = col.pelo;
+    ctx.strokeStyle = col.borde;
+    ctx.lineWidth = 0.03;
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    caja(ctx, -0.445, -0.66, 0.07, 0.26, 0.03, col.pelo, null, 0);
+    caja(ctx, 0.375, -0.66, 0.07, 0.26, 0.03, col.pelo, null, 0);
+
+    /* cejas */
+    ctx.save();
+    ctx.strokeStyle = col.pelo2;
+    ctx.lineWidth = 0.055;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-0.34, -0.71);
+    ctx.quadraticCurveTo(-0.22, -0.77, -0.09, -0.71);
+    ctx.moveTo(0.34, -0.71);
+    ctx.quadraticCurveTo(0.22, -0.77, 0.09, -0.71);
+    ctx.stroke();
+    ctx.restore();
+
+    /* gafas y ojos */
+    elip(ctx, -0.19, -0.52, 0.16, 0.14, 'rgba(255,255,255,0.30)', null, 0);
+    elip(ctx, 0.19, -0.52, 0.16, 0.14, 'rgba(255,255,255,0.30)', null, 0);
+    ojoCaricatura(ctx, -0.19, -0.52, 0.085, col, modo, parp, mir);
+    ojoCaricatura(ctx, 0.19, -0.52, 0.085, col, modo, parp, mir);
+    ctx.save();
+    ctx.strokeStyle = col.gafas;
+    ctx.lineWidth = 0.032;
+    ctx.beginPath();
+    ctx.ellipse(-0.19, -0.52, 0.17, 0.15, 0, 0, TAU);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(0.19, -0.52, 0.17, 0.15, 0, 0, TAU);
+    ctx.stroke();
+    ctx.lineWidth = 0.028;
+    ctx.beginPath();
+    ctx.moveTo(-0.02, -0.53);
+    ctx.quadraticCurveTo(0, -0.57, 0.02, -0.53);
+    ctx.moveTo(-0.36, -0.53);
+    ctx.lineTo(-0.43, -0.55);
+    ctx.moveTo(0.36, -0.53);
+    ctx.lineTo(0.43, -0.55);
+    ctx.stroke();
+    ctx.restore();
+
+    /* nariz */
+    elip(ctx, 0, -0.37, 0.085, 0.115, col.piel2, col.borde, 0.022);
+
+    /* bigote */
+    ctx.save();
+    ctx.fillStyle = col.pelo2;
+    ctx.strokeStyle = col.borde;
+    ctx.lineWidth = 0.018;
+    ctx.beginPath();
+    ctx.moveTo(0, -0.25);
+    ctx.quadraticCurveTo(-0.20, -0.29, -0.22, -0.17);
+    ctx.quadraticCurveTo(-0.10, -0.20, 0, -0.225);
+    ctx.quadraticCurveTo(0.10, -0.20, 0.22, -0.17);
+    ctx.quadraticCurveTo(0.20, -0.29, 0, -0.25);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    /* boca: se abre y cierra mientras habla */
+    ctx.save();
+    ctx.translate(0, -0.15);
+    if (habla > 0.06) {
+      var alto = 0.024 + habla * 0.10;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 0.115, alto, 0, 0, TAU);
+      ctx.fillStyle = col.boca;
+      ctx.fill();
+      ctx.strokeStyle = col.borde;
+      ctx.lineWidth = 0.018;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(0, alto * 0.55, 0.068, alto * 0.42, 0, 0, TAU);
+      ctx.fillStyle = col.boca2;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(0, -alto * 0.60, 0.082, alto * 0.24, 0, 0, TAU);
+      ctx.fillStyle = col.diente;
+      ctx.fill();
+    } else {
+      ctx.strokeStyle = col.borde;
+      ctx.lineWidth = 0.022;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(0, -0.01, 0.10, Math.PI * 0.18, Math.PI * 0.82);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   function dibujarCaracter(ctx, tipo, c, pose, t) {
     var col = coloresDe(tipo);
     if (tipo === 'gato') dibujarGato(ctx, col, pose, t);
+    else if (tipo === 'perro') dibujarPerro(ctx, col, pose, t);
+    else if (tipo === 'conejo') dibujarConejo(ctx, col, pose, t);
+    else if (tipo === 'zorro') dibujarZorro(ctx, col, pose, t);
+    else if (tipo === 'rana') dibujarRana(ctx, col, pose, t);
+    else if (tipo === 'loro') dibujarLoro(ctx, col, pose, t);
     else if (tipo === 'robot') dibujarRobot(ctx, col, pose, t);
     else if (tipo === 'planta') dibujarPlanta(ctx, col, pose, t);
     else if (tipo === 'nube') dibujarNube(ctx, col, pose, t);
+    else if (tipo === 'senor') dibujarSenor(ctx, col, pose, t);
     else dibujarBuho(ctx, col, pose, t);
   }
 
@@ -1647,7 +2191,8 @@
     ctx.save();
     ctx.globalAlpha = alfa;
     ctx.translate(x, y + bob);
-    ctx.scale(u, u);
+    var escala = tipo === 'senor' ? 1.16 : 1;
+    ctx.scale(u * escala, u * escala);
     dibujarCaracter(ctx, tipo, null, pose, t);
     ctx.restore();
   }
